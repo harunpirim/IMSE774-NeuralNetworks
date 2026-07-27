@@ -23,7 +23,6 @@ format:
 | **Room** | TBA |
 | **Course website** | <https://harunpirim.github.io/IMSE774-NeuralNetworks/> |
 | **Learning management** | Blackboard Ultra |
-| **Cross-listed as** | PSYC 735 and CSCI 735 |
 | **Prerequisite** | Graduate standing |
 
 : {tbl-colwidths="[28,72]"}
