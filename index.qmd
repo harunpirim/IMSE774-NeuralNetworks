@@ -52,6 +52,7 @@ MIT Press, 2024.
 - **[Syllabus](syllabus.qmd)** — grading, policies, and key dates
 - **[Schedule](schedule.qmd)** — week-by-week topics and readings
 - **[Lecture notes](notes/03-shallow-networks.qmd)** — one page per topic, with runnable code
+- **[Course flyer](flyer/flyer.pdf)** — one page to print, post, or forward to a colleague
 
 ## What This Course Covers
 

@@ -6,6 +6,9 @@ project:
     - syllabus.qmd
     - schedule.qmd
     - notes/*.qmd
+  # Built by flyer/build.sh, not by Quarto, so ship it as a static resource.
+  resources:
+    - flyer/flyer.pdf
 
 website:
   title: "IMSE 774 · Neural Networks"

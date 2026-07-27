@@ -1,4 +1,4 @@
-.PHONY: help site preview pdf all clean deep-clean notes check
+.PHONY: help site preview pdf all clean deep-clean notes check flyer
 
 QUARTO ?= quarto
 
@@ -11,6 +11,7 @@ help:
 	@echo "  make all        Website plus PDFs"
 	@echo "  make notes      Scaffold any lecture notes that don't exist yet"
 	@echo "  make check      List which notes exist"
+	@echo "  make flyer      Rebuild the one-page recruiting flyer"
 	@echo "  make clean      Remove rendered output"
 	@echo "  make deep-clean Also drop the execution cache (forces full re-run)"
 
@@ -30,6 +31,9 @@ pdf:
 	done
 
 all: site pdf
+
+flyer:
+	cd flyer && ./build.sh
 
 notes:
 	python scripts/new_note.py

@@ -13,6 +13,15 @@ Icon?
 *_files/
 *.tex
 !assets/tex/*.tex
+!flyer/*.tex
+
+# --- Flyer build intermediates (flyer.pdf and banner.pdf are committed) ---
+flyer/*.aux
+flyer/*.log
+flyer/*.out
+flyer/build.log
+flyer/banner_fits.npz
+flyer/*.png
 
 # --- Python ---
 .venv/
