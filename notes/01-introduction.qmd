@@ -1,0 +1,106 @@
+---
+title: "Introduction and Supervised Learning"
+subtitle: "Week 1 · August 25 & 27, 2026"
+description: "What deep learning is, the three learning paradigms, and the supervised learning recipe."
+categories: [foundations]
+---
+
+::: {.lecture-meta}
+**Reading** Prince, *Understanding Deep Learning*, Chapters 1–2
+:::
+
+::: {.callout-warning appearance="simple"}
+These notes are still being written. The reading above is authoritative until
+this banner disappears.
+:::
+
+## Learning Objectives
+
+By the end of this week you should be able to:
+
+1. Distinguish supervised, unsupervised, and reinforcement learning, and give an example of each.
+2. Define a model, its parameters, and the role of a loss function.
+3. Describe the train/test workflow and explain what inference means.
+4. Work through 1D linear regression end to end as the simplest supervised model.
+5. Discuss the ethical considerations raised by deployed deep learning systems.
+
+```{python}
+#| label: setup
+#| code-fold: true
+#| code-summary: "Plotting setup (click to expand)"
+
+import numpy as np
+import matplotlib.pyplot as plt
+import torch
+
+torch.manual_seed(774)
+np.random.seed(774)
+
+plt.rcParams.update({
+    "figure.figsize": (7, 4),
+    "figure.dpi": 130,
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+    "axes.grid": True,
+    "grid.alpha": 0.25,
+    "font.size": 10,
+    "legend.frameon": False,
+})
+
+NDSU_GREEN = "#005643"
+NDSU_GOLD  = "#FFC72C"
+ACCENT     = "#C1121F"
+```
+
+---
+
+## What Deep Learning Is
+
+TODO
+
+## Supervised Learning
+
+TODO
+
+## Unsupervised and Generative Models
+
+TODO
+
+## Reinforcement Learning
+
+TODO
+
+## Linear Regression: The Whole Recipe in Miniature
+
+TODO
+
+## Ethics
+
+TODO
+
+## How This Course Is Organized
+
+TODO
+
+## Summary
+
+TODO
+
+---
+
+## Exercises
+
+Problem numbers refer to Prince, Chapters 1–2.
+
+**1.** TODO
+
+**2.** TODO
+
+**3. Computational.** TODO
+
+---
+
+## Further Reading
+
+- Prince, *Understanding Deep Learning*, Chapters 1–2.
+- TODO

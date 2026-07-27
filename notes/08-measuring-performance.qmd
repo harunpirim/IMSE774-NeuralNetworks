@@ -1,0 +1,103 @@
+---
+title: "Measuring Performance"
+subtitle: "Week 8 · October 13 & 15, 2026"
+description: "Training, validation, and test error; the bias-variance trade-off; double descent."
+categories: [training]
+---
+
+::: {.lecture-meta}
+**Reading** Prince, *Understanding Deep Learning*, Chapter 8 &nbsp;·&nbsp;
+**Assignment** A7, due Sunday, October 18
+:::
+
+::: {.callout-warning appearance="simple"}
+These notes are still being written. The reading above is authoritative until
+this banner disappears.
+:::
+
+## Learning Objectives
+
+By the end of this week you should be able to:
+
+1. Separate noise, bias, and variance as sources of test error.
+2. Design a train/validation/test split and explain why the test set is used once.
+3. Describe how error changes with model capacity, training-set size, and depth.
+4. Explain the double-descent phenomenon and why it contradicts classical intuition.
+5. Run a defensible hyperparameter search.
+
+```{python}
+#| label: setup
+#| code-fold: true
+#| code-summary: "Plotting setup (click to expand)"
+
+import numpy as np
+import matplotlib.pyplot as plt
+import torch
+
+torch.manual_seed(774)
+np.random.seed(774)
+
+plt.rcParams.update({
+    "figure.figsize": (7, 4),
+    "figure.dpi": 130,
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+    "axes.grid": True,
+    "grid.alpha": 0.25,
+    "font.size": 10,
+    "legend.frameon": False,
+})
+
+NDSU_GREEN = "#005643"
+NDSU_GOLD  = "#FFC72C"
+ACCENT     = "#C1121F"
+```
+
+---
+
+## Training, Validation, and Test Error
+
+TODO
+
+## Sources of Error: Noise, Bias, Variance
+
+TODO
+
+## The Bias-Variance Trade-Off
+
+TODO
+
+## Double Descent
+
+TODO
+
+## Choosing Hyperparameters
+
+TODO
+
+## Cross-Validation in Practice
+
+TODO
+
+## Summary
+
+TODO
+
+---
+
+## Exercises
+
+Problem numbers refer to Prince, Chapter 8.
+
+**1.** TODO
+
+**2.** TODO
+
+**3. Computational.** TODO
+
+---
+
+## Further Reading
+
+- Prince, *Understanding Deep Learning*, Chapter 8.
+- TODO

@@ -1,0 +1,125 @@
+project:
+  type: website
+  output-dir: _site
+  render:
+    - index.qmd
+    - syllabus.qmd
+    - schedule.qmd
+    - notes/*.qmd
+
+website:
+  title: "IME 774 · Neural Networks"
+  description: "Graduate course in neural networks and deep learning, North Dakota State University."
+  site-url: https://harunpirim.github.io/IMSE774-NeuralNetworks/
+  repo-url: https://github.com/harunpirim/IMSE774-NeuralNetworks
+  repo-actions: [issue]
+  page-navigation: true
+  back-to-top-navigation: true
+  navbar:
+    background: primary
+    search: true
+    left:
+      - text: Home
+        href: index.qmd
+      - text: Syllabus
+        href: syllabus.qmd
+      - text: Schedule
+        href: schedule.qmd
+      - text: Lecture Notes
+        href: notes/03-shallow-networks.qmd
+    right:
+      - icon: github
+        href: https://github.com/harunpirim/IMSE774-NeuralNetworks
+        aria-label: GitHub
+  sidebar:
+    style: docked
+    search: true
+    collapse-level: 2
+    contents:
+      - text: Home
+        href: index.qmd
+      - text: Syllabus
+        href: syllabus.qmd
+      - text: Schedule
+        href: schedule.qmd
+      - section: "Foundations"
+        contents:
+          - notes/01-introduction.qmd
+          - notes/02-math-background.qmd
+          - notes/03-shallow-networks.qmd
+          - notes/04-deep-networks.qmd
+      - section: "Training"
+        contents:
+          - notes/05-loss-functions.qmd
+          - notes/06-fitting-models.qmd
+          - notes/07-gradients-initialization.qmd
+          - notes/08-measuring-performance.qmd
+          - notes/09-regularization.qmd
+      - section: "Architectures"
+        contents:
+          - notes/10-convolutional-networks.qmd
+          - notes/11-transformers.qmd
+          - notes/12-large-language-models.qmd
+          - notes/13-graph-neural-networks.qmd
+      - section: "Generative Models"
+        contents:
+          - notes/14-vaes-and-gans.qmd
+          - notes/15-diffusion-models.qmd
+  page-footer:
+    left: "IME 774 · Fall 2026 · Harun Pirim, PhD"
+    right: "Built with [Quarto](https://quarto.org)"
+
+format:
+  html:
+    theme:
+      light: [cosmo, assets/css/theme.scss]
+    css: assets/css/styles.css
+    toc: true
+    toc-depth: 3
+    toc-title: "On this page"
+    number-sections: true
+    code-copy: true
+    code-overflow: wrap
+    code-fold: false
+    highlight-style: github
+    fig-align: center
+    fig-cap-location: bottom
+    tbl-cap-location: top
+    link-external-newwindow: true
+    html-math-method: mathjax
+  pdf:
+    documentclass: scrartcl
+    papersize: letter
+    # Pages use `##` as their top level, which Pandoc would otherwise map to
+    # \subsection and number as 0.1, 0.2, ... Shifting makes them \section.
+    # Consequence: do not use a level-1 `#` heading in page bodies, since it
+    # would be promoted into the document title.
+    shift-heading-level-by: -1
+    geometry:
+      - margin=1in
+    fontsize: 11pt
+    linkcolor: RoyalBlue
+    urlcolor: RoyalBlue
+    citecolor: RoyalBlue
+    colorlinks: true
+    number-sections: true
+    toc: true
+    toc-depth: 2
+    fig-pos: "H"
+    include-in-header: assets/tex/preamble.tex
+    keep-tex: false
+
+# Pinned so the project ignores unrelated kernelspecs registered on the machine.
+jupyter: python3
+
+execute:
+  freeze: auto
+  echo: true
+  warning: false
+
+knitr:
+  opts_chunk:
+    dev: "png"
+    dpi: 150
+
+bibliography: references.bib

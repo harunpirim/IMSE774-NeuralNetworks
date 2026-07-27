@@ -1,0 +1,137 @@
+---
+title: "Course Schedule"
+subtitle: "Fall 2026 · Tuesday & Thursday, 12:30–1:45 p.m."
+format:
+  html:
+    number-sections: false
+  pdf:
+    number-sections: false
+    toc: false
+---
+
+Thirty-one class meetings run from **Tuesday, August 25** through **Thursday,
+December 10, 2026**. Chapter numbers refer to Prince, *Understanding Deep
+Learning* (MIT Press, 2024).
+
+::: {.callout-tip appearance="simple"}
+Read the assigned chapter **before** the first meeting of the week. Lecture time
+is spent on the parts that are hard to get from reading alone: derivations,
+failure modes, and code.
+:::
+
+## Weekly Plan
+
+| Week | Dates | Topic | Reading | Due |
+|:--:|:--------------|:-----------------------------------|:--------|:-----------|
+| 1 | Aug 25, 27 | Introduction; supervised learning | Ch. 1–2 | — |
+| 2 | Sep 1, 3 | Mathematical & Python background | App. B | A1 |
+| 3 | Sep 8, 10 | Shallow neural networks | Ch. 3 | A2 |
+| 4 | Sep 15, 17 | Deep neural networks | Ch. 4 | A3 |
+| 5 | Sep 22, 24 | Loss functions | Ch. 5 | A4 |
+| 6 | Sep 29, Oct 1 | Fitting models | Ch. 6 | A5 |
+| 7 | Oct 6, 8 | Gradients & initialization | Ch. 7 | A6, **Proposal** |
+| 8 | Oct 13, 15 | Measuring performance | Ch. 8 | A7 |
+| 9 | Oct 20, 22 | Regularization; **midterm Oct 22** | Ch. 9 | **Midterm** |
+| 10 | Oct 27, 29 | Convolutional networks; residual networks | Ch. 10–11 | A8 |
+| 11 | Nov 3, 5 | Transformers | Ch. 12 | A9, **Paper choice** |
+| 12 | Nov 10, 12 | Large language models | Ch. 12 + notes | A10, **Progress** |
+| 13 | Nov 17, 19 | Graph neural networks | Ch. 13 | A11 |
+| 14 | Nov 24 | VAEs & GANs *(no class Nov 26)* | Ch. 15, 17 | A12 |
+| 15 | Dec 1, 3 | Diffusion models; presentations begin | Ch. 18 | — |
+| 16 | Dec 8, 10 | Student presentations | — | **Report Dec 14** |
+
+: {tbl-colwidths="[6,16,34,16,18]"}
+
+## Meeting-by-Meeting Detail
+
+### Part I — Foundations
+
+| Date | Session | Topic |
+|:-------------|:--:|:-----------------------------------------------------|
+| Tue, Aug 25 | 1 | Course overview; what deep learning is and is not |
+| Thu, Aug 27 | 2 | Supervised learning: models, parameters, training |
+| Tue, Sep 1 | 3 | Linear algebra and calculus you actually need |
+| Thu, Sep 3 | 4 | Probability refresher; PyTorch tensors and autograd |
+| Tue, Sep 8 | 5 | Shallow networks: one hidden layer, ReLU, linear regions |
+| Thu, Sep 10 | 6 | Universal approximation; shallow networks in PyTorch |
+| Tue, Sep 15 | 7 | Composing networks; matrix notation for deep models |
+| Thu, Sep 17 | 8 | Depth vs. width; counting linear regions |
+
+: {tbl-colwidths="[22,8,70]"}
+
+### Part II — Training Neural Networks
+
+| Date | Session | Topic |
+|:-------------|:--:|:-----------------------------------------------------|
+| Tue, Sep 22 | 9 | Maximum likelihood; recipe for constructing losses |
+| Thu, Sep 24 | 10 | Regression, binary and multiclass classification losses |
+| Tue, Sep 29 | 11 | Gradient descent; loss surfaces and local minima |
+| Thu, Oct 1 | 12 | Stochastic gradient descent, momentum, Adam |
+| Tue, Oct 6 | 13 | Backpropagation derived and implemented from scratch |
+| Thu, Oct 8 | 14 | Vanishing/exploding gradients; He and Glorot initialization |
+| Tue, Oct 13 | 15 | Training, validation, and test error; the bias–variance trade-off |
+| Thu, Oct 15 | 16 | Double descent; hyperparameter search; midterm review |
+| Tue, Oct 20 | 17 | Explicit and implicit regularization; dropout, early stopping |
+
+: {tbl-colwidths="[22,8,70]"}
+
+::: {.callout-important}
+## Midterm Exam — Thursday, October 22
+In class, computer-based, covering Chapters 1–9. Bring a laptop.
+:::
+
+### Part III — Architectures
+
+| Date | Session | Topic |
+|:-------------|:--:|:-----------------------------------------------------|
+| Tue, Oct 27 | 19 | Convolution, pooling, and image classification |
+| Thu, Oct 29 | 20 | Residual connections, batch norm, and modern CNNs |
+| Tue, Nov 3 | 21 | Self-attention and the transformer block |
+| Thu, Nov 5 | 22 | Positional encoding; encoder, decoder, and encoder–decoder models |
+| Tue, Nov 10 | 23 | Pretraining, fine-tuning, and scaling laws |
+| Thu, Nov 12 | 24 | Tokenization, RoPE, KV caching, and inference efficiency |
+| Tue, Nov 17 | 25 | Graph representation; permutation equivariance |
+| Thu, Nov 19 | 26 | Graph convolutions; node, edge, and graph-level tasks |
+
+: {tbl-colwidths="[22,8,70]"}
+
+### Part IV — Generative Models & Presentations
+
+| Date | Session | Topic |
+|:-------------|:--:|:-----------------------------------------------------|
+| Tue, Nov 24 | 27 | Latent variable models: VAEs and GANs |
+| Thu, Nov 26 | — | *No class — Thanksgiving holiday* |
+| Tue, Dec 1 | 28 | Denoising diffusion: forward process, reverse process, sampling |
+| Thu, Dec 3 | 29 | Student presentations |
+| Tue, Dec 8 | 30 | Student presentations |
+| Thu, Dec 10 | 31 | Student presentations; course wrap-up |
+
+: {tbl-colwidths="[22,8,70]"}
+
+## NDSU Academic Calendar Dates
+
+Drawn from the [NDSU Fall 2026 academic calendar](https://www.ndsu.edu/onestop/dates/calendar#fall-2026-2).
+
+| Date | Event |
+|:----------------------|:------------------------------------------------|
+| Mon, Aug 24 | Classes begin at 4:00 p.m. |
+| Tue, Aug 25 | First full day of classes |
+| Wed, Sep 2 | Last day to add; last day for no-record drop at 100% refund |
+| Mon, Sep 7 | Labor Day — no classes |
+| Mon, Sep 14 | Last day to request audit or pass/fail |
+| Mon, Sep 21 | Enrollment census |
+| Fri, Oct 16 | Grades of 'Incomplete' convert to 'F' |
+| Wed, Nov 11 | Veterans Day — no classes |
+| Fri, Nov 13 | Last day to drop with a 'W' record |
+| Wed–Fri, Nov 25–27 | Thanksgiving holiday — no classes |
+| Mon–Fri, Dec 7–11 | Dead Week |
+| Fri, Dec 11 | Last day of Fall classes |
+| Mon–Fri, Dec 14–18 | Final examinations |
+
+: {tbl-colwidths="[28,72]"}
+
+::: {.callout-note appearance="simple"}
+Labor Day and Veterans Day both fall on non-class days this semester, so
+Thanksgiving is the only holiday that removes a meeting from our Tuesday/Thursday
+slot.
+:::

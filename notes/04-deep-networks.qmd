@@ -1,0 +1,103 @@
+---
+title: "Deep Neural Networks"
+subtitle: "Week 4 · September 15 & 17, 2026"
+description: "Composing hidden layers, matrix notation for depth, and why depth beats width."
+categories: [foundations]
+---
+
+::: {.lecture-meta}
+**Reading** Prince, *Understanding Deep Learning*, Chapter 4 &nbsp;·&nbsp;
+**Assignment** A3, due Sunday, September 20
+:::
+
+::: {.callout-warning appearance="simple"}
+These notes are still being written. The reading above is authoritative until
+this banner disappears.
+:::
+
+## Learning Objectives
+
+By the end of this week you should be able to:
+
+1. Compose two shallow networks and describe the resulting function.
+2. Write a deep network in general matrix notation with weights and biases per layer.
+3. Explain why the number of linear regions grows exponentially with depth.
+4. Compare depth and width at a fixed parameter budget.
+5. Implement a configurable-depth MLP in PyTorch.
+
+```{python}
+#| label: setup
+#| code-fold: true
+#| code-summary: "Plotting setup (click to expand)"
+
+import numpy as np
+import matplotlib.pyplot as plt
+import torch
+
+torch.manual_seed(774)
+np.random.seed(774)
+
+plt.rcParams.update({
+    "figure.figsize": (7, 4),
+    "figure.dpi": 130,
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+    "axes.grid": True,
+    "grid.alpha": 0.25,
+    "font.size": 10,
+    "legend.frameon": False,
+})
+
+NDSU_GREEN = "#005643"
+NDSU_GOLD  = "#FFC72C"
+ACCENT     = "#C1121F"
+```
+
+---
+
+## Composing Two Networks
+
+TODO
+
+## From Composition to Depth
+
+TODO
+
+## Matrix Notation for Deep Networks
+
+TODO
+
+## Counting Linear Regions with Depth
+
+TODO
+
+## Shallow vs. Deep at Equal Capacity
+
+TODO
+
+## Deep Networks in PyTorch
+
+TODO
+
+## Summary
+
+TODO
+
+---
+
+## Exercises
+
+Problem numbers refer to Prince, Chapter 4.
+
+**1.** TODO
+
+**2.** TODO
+
+**3. Computational.** TODO
+
+---
+
+## Further Reading
+
+- Prince, *Understanding Deep Learning*, Chapter 4.
+- TODO

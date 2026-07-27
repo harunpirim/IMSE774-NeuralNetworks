@@ -1,0 +1,108 @@
+---
+title: "Graph Neural Networks"
+subtitle: "Week 13 · November 17 & 19, 2026"
+description: "Representing graphs, permutation equivariance, message passing, and graph-level tasks."
+categories: [architectures]
+---
+
+::: {.lecture-meta}
+**Reading** Prince, *Understanding Deep Learning*, Chapter 13 &nbsp;·&nbsp;
+**Assignment** A11, due Sunday, November 22
+:::
+
+::: {.callout-warning appearance="simple"}
+These notes are still being written. The reading above is authoritative until
+this banner disappears.
+:::
+
+## Learning Objectives
+
+By the end of this week you should be able to:
+
+1. Represent a graph with an adjacency matrix and a node feature matrix.
+2. Explain permutation invariance and equivariance, and why they are required.
+3. Derive a graph convolution as neighborhood aggregation.
+4. Distinguish node-, edge-, and graph-level prediction tasks.
+5. Describe how pooling produces graph-level representations.
+6. Implement a GCN layer from the adjacency matrix.
+
+```{python}
+#| label: setup
+#| code-fold: true
+#| code-summary: "Plotting setup (click to expand)"
+
+import numpy as np
+import matplotlib.pyplot as plt
+import torch
+
+torch.manual_seed(774)
+np.random.seed(774)
+
+plt.rcParams.update({
+    "figure.figsize": (7, 4),
+    "figure.dpi": 130,
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+    "axes.grid": True,
+    "grid.alpha": 0.25,
+    "font.size": 10,
+    "legend.frameon": False,
+})
+
+NDSU_GREEN = "#005643"
+NDSU_GOLD  = "#FFC72C"
+ACCENT     = "#C1121F"
+```
+
+---
+
+## Graphs and Their Representation
+
+TODO
+
+## Permutation Invariance and Equivariance
+
+TODO
+
+## Graph Convolutional Networks
+
+TODO
+
+## Message Passing
+
+TODO
+
+## Node, Edge, and Graph-Level Tasks
+
+TODO
+
+## Pooling and Readout
+
+TODO
+
+## Implementing a GCN Layer
+
+TODO
+
+## Summary
+
+TODO
+
+---
+
+## Exercises
+
+Problem numbers refer to Prince, Chapter 13.
+
+**1.** TODO
+
+**2.** TODO
+
+**3. Computational.** TODO
+
+---
+
+## Further Reading
+
+- Prince, *Understanding Deep Learning*, Chapter 13.
+- TODO

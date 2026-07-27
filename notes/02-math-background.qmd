@@ -1,0 +1,103 @@
+---
+title: "Mathematical and Computational Background"
+subtitle: "Week 2 · September 1 & 3, 2026"
+description: "The linear algebra, calculus, probability, and PyTorch you need for the rest of the course."
+categories: [foundations]
+---
+
+::: {.lecture-meta}
+**Reading** Prince, *Understanding Deep Learning*, Appendix B; UDL notebooks 1.1–2.1 &nbsp;·&nbsp;
+**Assignment** A1, due Sunday, September 6
+:::
+
+::: {.callout-warning appearance="simple"}
+These notes are still being written. The reading above is authoritative until
+this banner disappears.
+:::
+
+## Learning Objectives
+
+By the end of this week you should be able to:
+
+1. Manipulate vectors and matrices, and read the book's index and matrix notation fluently.
+2. Compute gradients and apply the chain rule to composite functions.
+3. State the probability facts used throughout: joint, conditional, expectation, and common distributions.
+4. Create, reshape, and broadcast PyTorch tensors.
+5. Use autograd to obtain gradients without deriving them by hand.
+
+```{python}
+#| label: setup
+#| code-fold: true
+#| code-summary: "Plotting setup (click to expand)"
+
+import numpy as np
+import matplotlib.pyplot as plt
+import torch
+
+torch.manual_seed(774)
+np.random.seed(774)
+
+plt.rcParams.update({
+    "figure.figsize": (7, 4),
+    "figure.dpi": 130,
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+    "axes.grid": True,
+    "grid.alpha": 0.25,
+    "font.size": 10,
+    "legend.frameon": False,
+})
+
+NDSU_GREEN = "#005643"
+NDSU_GOLD  = "#FFC72C"
+ACCENT     = "#C1121F"
+```
+
+---
+
+## Vectors, Matrices, and Notation
+
+TODO
+
+## Derivatives and the Chain Rule
+
+TODO
+
+## Probability Refresher
+
+TODO
+
+## Tensors in PyTorch
+
+TODO
+
+## Automatic Differentiation
+
+TODO
+
+## Setting Up Your Environment
+
+TODO
+
+## Summary
+
+TODO
+
+---
+
+## Exercises
+
+Problem numbers refer to Prince, Appendix B; UDL notebooks 1.1–2.1.
+
+**1.** TODO
+
+**2.** TODO
+
+**3. Computational.** TODO
+
+---
+
+## Further Reading
+
+- Prince, *Understanding Deep Learning*, Appendix B; UDL notebooks 1.1–2.1.
+- TODO

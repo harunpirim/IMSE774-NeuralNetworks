@@ -1,0 +1,103 @@
+---
+title: "Gradients and Initialization"
+subtitle: "Week 7 · October 6 & 8, 2026"
+description: "Backpropagation derived from scratch, plus why initialization determines whether training works."
+categories: [training]
+---
+
+::: {.lecture-meta}
+**Reading** Prince, *Understanding Deep Learning*, Chapter 7 &nbsp;·&nbsp;
+**Assignment** A6, due Sunday, October 11; project proposal due October 8
+:::
+
+::: {.callout-warning appearance="simple"}
+These notes are still being written. The reading above is authoritative until
+this banner disappears.
+:::
+
+## Learning Objectives
+
+By the end of this week you should be able to:
+
+1. Derive backpropagation for a deep network using the chain rule.
+2. Implement forward and backward passes manually and check them against autograd.
+3. Explain vanishing and exploding gradients in terms of variance propagation.
+4. Derive He and Glorot initialization.
+5. Diagnose a network that fails to train because of poor initialization.
+
+```{python}
+#| label: setup
+#| code-fold: true
+#| code-summary: "Plotting setup (click to expand)"
+
+import numpy as np
+import matplotlib.pyplot as plt
+import torch
+
+torch.manual_seed(774)
+np.random.seed(774)
+
+plt.rcParams.update({
+    "figure.figsize": (7, 4),
+    "figure.dpi": 130,
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+    "axes.grid": True,
+    "grid.alpha": 0.25,
+    "font.size": 10,
+    "legend.frameon": False,
+})
+
+NDSU_GREEN = "#005643"
+NDSU_GOLD  = "#FFC72C"
+ACCENT     = "#C1121F"
+```
+
+---
+
+## The Problem: Gradients of a Composite Function
+
+TODO
+
+## Backpropagation, Derived
+
+TODO
+
+## Implementing Backpropagation by Hand
+
+TODO
+
+## Parameter Initialization
+
+TODO
+
+## Vanishing and Exploding Gradients
+
+TODO
+
+## He and Glorot Initialization
+
+TODO
+
+## Summary
+
+TODO
+
+---
+
+## Exercises
+
+Problem numbers refer to Prince, Chapter 7.
+
+**1.** TODO
+
+**2.** TODO
+
+**3. Computational.** TODO
+
+---
+
+## Further Reading
+
+- Prince, *Understanding Deep Learning*, Chapter 7.
+- TODO

@@ -1,0 +1,107 @@
+---
+title: "Regularization"
+subtitle: "Week 9 · October 20, 2026"
+description: "Explicit and implicit regularization: weight decay, dropout, early stopping, augmentation."
+categories: [training]
+---
+
+::: {.lecture-meta}
+**Reading** Prince, *Understanding Deep Learning*, Chapter 9 &nbsp;·&nbsp;
+**Assignment** Midterm exam Thursday, October 22
+:::
+
+::: {.callout-warning appearance="simple"}
+These notes are still being written. The reading above is authoritative until
+this banner disappears.
+:::
+
+## Learning Objectives
+
+By the end of this week you should be able to:
+
+1. Distinguish explicit from implicit regularization.
+2. Add an L2 penalty and connect weight decay to a Gaussian prior on the weights.
+3. Explain dropout as an implicit ensemble, and describe its train/test asymmetry.
+4. Justify early stopping, ensembling, label smoothing, and data augmentation.
+5. Choose regularizers appropriate to a given dataset size and architecture.
+
+```{python}
+#| label: setup
+#| code-fold: true
+#| code-summary: "Plotting setup (click to expand)"
+
+import numpy as np
+import matplotlib.pyplot as plt
+import torch
+
+torch.manual_seed(774)
+np.random.seed(774)
+
+plt.rcParams.update({
+    "figure.figsize": (7, 4),
+    "figure.dpi": 130,
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+    "axes.grid": True,
+    "grid.alpha": 0.25,
+    "font.size": 10,
+    "legend.frameon": False,
+})
+
+NDSU_GREEN = "#005643"
+NDSU_GOLD  = "#FFC72C"
+ACCENT     = "#C1121F"
+```
+
+---
+
+## Explicit Regularization
+
+TODO
+
+## Weight Decay and the Bayesian View
+
+TODO
+
+## Implicit Regularization from SGD
+
+TODO
+
+## Early Stopping
+
+TODO
+
+## Ensembling and Dropout
+
+TODO
+
+## Label Smoothing and Data Augmentation
+
+TODO
+
+## Transfer Learning and Self-Supervision
+
+TODO
+
+## Summary
+
+TODO
+
+---
+
+## Exercises
+
+Problem numbers refer to Prince, Chapter 9.
+
+**1.** TODO
+
+**2.** TODO
+
+**3. Computational.** TODO
+
+---
+
+## Further Reading
+
+- Prince, *Understanding Deep Learning*, Chapter 9.
+- TODO

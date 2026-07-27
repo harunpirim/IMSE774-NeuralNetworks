@@ -1,0 +1,107 @@
+---
+title: "Fitting Models"
+subtitle: "Week 6 · September 29 & October 1, 2026"
+description: "Gradient descent, stochastic gradient descent, momentum, and Adam."
+categories: [training]
+---
+
+::: {.lecture-meta}
+**Reading** Prince, *Understanding Deep Learning*, Chapter 6 &nbsp;·&nbsp;
+**Assignment** A5, due Sunday, October 4
+:::
+
+::: {.callout-warning appearance="simple"}
+These notes are still being written. The reading above is authoritative until
+this banner disappears.
+:::
+
+## Learning Objectives
+
+By the end of this week you should be able to:
+
+1. Implement gradient descent and reason about the effect of the learning rate.
+2. Describe loss surfaces, local minima, and saddle points.
+3. Explain how stochastic gradient descent differs from full-batch descent, and why that helps.
+4. Derive the momentum and Nesterov momentum updates.
+5. State the Adam update rule and explain each of its terms.
+
+```{python}
+#| label: setup
+#| code-fold: true
+#| code-summary: "Plotting setup (click to expand)"
+
+import numpy as np
+import matplotlib.pyplot as plt
+import torch
+
+torch.manual_seed(774)
+np.random.seed(774)
+
+plt.rcParams.update({
+    "figure.figsize": (7, 4),
+    "figure.dpi": 130,
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+    "axes.grid": True,
+    "grid.alpha": 0.25,
+    "font.size": 10,
+    "legend.frameon": False,
+})
+
+NDSU_GREEN = "#005643"
+NDSU_GOLD  = "#FFC72C"
+ACCENT     = "#C1121F"
+```
+
+---
+
+## Gradient Descent
+
+TODO
+
+## Loss Surfaces, Local Minima, and Saddle Points
+
+TODO
+
+## Stochastic Gradient Descent
+
+TODO
+
+## Momentum
+
+TODO
+
+## Adam and Adaptive Methods
+
+TODO
+
+## Learning Rate Schedules
+
+TODO
+
+## Optimizers in PyTorch
+
+TODO
+
+## Summary
+
+TODO
+
+---
+
+## Exercises
+
+Problem numbers refer to Prince, Chapter 6.
+
+**1.** TODO
+
+**2.** TODO
+
+**3. Computational.** TODO
+
+---
+
+## Further Reading
+
+- Prince, *Understanding Deep Learning*, Chapter 6.
+- TODO

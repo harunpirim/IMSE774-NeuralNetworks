@@ -1,0 +1,107 @@
+---
+title: "Loss Functions"
+subtitle: "Week 5 · September 22 & 24, 2026"
+description: "Deriving losses from maximum likelihood for regression, binary, and multiclass problems."
+categories: [training]
+---
+
+::: {.lecture-meta}
+**Reading** Prince, *Understanding Deep Learning*, Chapter 5 &nbsp;·&nbsp;
+**Assignment** A4, due Sunday, September 27
+:::
+
+::: {.callout-warning appearance="simple"}
+These notes are still being written. The reading above is authoritative until
+this banner disappears.
+:::
+
+## Learning Objectives
+
+By the end of this week you should be able to:
+
+1. Derive a loss function from a probability distribution over outputs via maximum likelihood.
+2. Show that least squares follows from a normal distribution with constant variance.
+3. Construct binary cross-entropy from a Bernoulli distribution and the logistic sigmoid.
+4. Construct multiclass cross-entropy from a categorical distribution and the softmax.
+5. Handle heteroscedastic and multi-output problems.
+
+```{python}
+#| label: setup
+#| code-fold: true
+#| code-summary: "Plotting setup (click to expand)"
+
+import numpy as np
+import matplotlib.pyplot as plt
+import torch
+
+torch.manual_seed(774)
+np.random.seed(774)
+
+plt.rcParams.update({
+    "figure.figsize": (7, 4),
+    "figure.dpi": 130,
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+    "axes.grid": True,
+    "grid.alpha": 0.25,
+    "font.size": 10,
+    "legend.frameon": False,
+})
+
+NDSU_GREEN = "#005643"
+NDSU_GOLD  = "#FFC72C"
+ACCENT     = "#C1121F"
+```
+
+---
+
+## Maximum Likelihood
+
+TODO
+
+## The Recipe for Constructing a Loss
+
+TODO
+
+## Regression: Least Squares
+
+TODO
+
+## Binary Classification: Cross-Entropy
+
+TODO
+
+## Multiclass Classification: Softmax
+
+TODO
+
+## Heteroscedastic and Multiple Outputs
+
+TODO
+
+## Losses in PyTorch
+
+TODO
+
+## Summary
+
+TODO
+
+---
+
+## Exercises
+
+Problem numbers refer to Prince, Chapter 5.
+
+**1.** TODO
+
+**2.** TODO
+
+**3. Computational.** TODO
+
+---
+
+## Further Reading
+
+- Prince, *Understanding Deep Learning*, Chapter 5.
+- TODO

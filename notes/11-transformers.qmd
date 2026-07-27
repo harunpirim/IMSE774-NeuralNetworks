@@ -1,0 +1,112 @@
+---
+title: "Transformers"
+subtitle: "Week 11 · November 3 & 5, 2026"
+description: "Self-attention, multi-head attention, positional encoding, and the three transformer families."
+categories: [architectures]
+---
+
+::: {.lecture-meta}
+**Reading** Prince, *Understanding Deep Learning*, Chapter 12 &nbsp;·&nbsp;
+**Assignment** A9, due Sunday, November 8; paper choice due November 5
+:::
+
+::: {.callout-warning appearance="simple"}
+These notes are still being written. The reading above is authoritative until
+this banner disappears.
+:::
+
+## Learning Objectives
+
+By the end of this week you should be able to:
+
+1. Explain why sequence data breaks the assumptions behind fully connected and convolutional layers.
+2. Derive scaled dot-product attention and say why the scaling factor is there.
+3. Describe queries, keys, values, and multi-head attention.
+4. Assemble a full transformer block: attention, feed-forward, residuals, layer norm.
+5. Compare encoder, decoder, and encoder-decoder models and their uses.
+6. Implement self-attention from scratch and check it against PyTorch.
+
+```{python}
+#| label: setup
+#| code-fold: true
+#| code-summary: "Plotting setup (click to expand)"
+
+import numpy as np
+import matplotlib.pyplot as plt
+import torch
+
+torch.manual_seed(774)
+np.random.seed(774)
+
+plt.rcParams.update({
+    "figure.figsize": (7, 4),
+    "figure.dpi": 130,
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+    "axes.grid": True,
+    "grid.alpha": 0.25,
+    "font.size": 10,
+    "legend.frameon": False,
+})
+
+NDSU_GREEN = "#005643"
+NDSU_GOLD  = "#FFC72C"
+ACCENT     = "#C1121F"
+```
+
+---
+
+## Processing Sequences
+
+TODO
+
+## Dot-Product Self-Attention
+
+TODO
+
+## Scaled Dot-Product Attention
+
+TODO
+
+## Multi-Head Attention
+
+TODO
+
+## The Transformer Block
+
+TODO
+
+## Positional Encoding
+
+TODO
+
+## Encoder, Decoder, and Encoder-Decoder Models
+
+TODO
+
+## Self-Attention from Scratch
+
+TODO
+
+## Summary
+
+TODO
+
+---
+
+## Exercises
+
+Problem numbers refer to Prince, Chapter 12.
+
+**1.** TODO
+
+**2.** TODO
+
+**3. Computational.** TODO
+
+---
+
+## Further Reading
+
+- Prince, *Understanding Deep Learning*, Chapter 12.
+- TODO

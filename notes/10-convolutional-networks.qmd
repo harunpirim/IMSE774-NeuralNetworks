@@ -1,0 +1,112 @@
+---
+title: "Convolutional Networks"
+subtitle: "Week 10 · October 27 & 29, 2026"
+description: "Convolution, pooling, residual connections, batch normalization, and modern image models."
+categories: [architectures]
+---
+
+::: {.lecture-meta}
+**Reading** Prince, *Understanding Deep Learning*, Chapters 10–11 &nbsp;·&nbsp;
+**Assignment** A8, due Sunday, November 1
+:::
+
+::: {.callout-warning appearance="simple"}
+These notes are still being written. The reading above is authoritative until
+this banner disappears.
+:::
+
+## Learning Objectives
+
+By the end of this week you should be able to:
+
+1. Motivate convolution through parameter sharing and translation equivariance.
+2. Compute output shapes given kernel size, stride, padding, and dilation.
+3. Describe channels, pooling, and the standard downsampling pattern.
+4. Explain why residual connections make very deep networks trainable.
+5. Describe batch normalization and its effect on the loss surface.
+6. Build and train a CNN image classifier in PyTorch.
+
+```{python}
+#| label: setup
+#| code-fold: true
+#| code-summary: "Plotting setup (click to expand)"
+
+import numpy as np
+import matplotlib.pyplot as plt
+import torch
+
+torch.manual_seed(774)
+np.random.seed(774)
+
+plt.rcParams.update({
+    "figure.figsize": (7, 4),
+    "figure.dpi": 130,
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+    "axes.grid": True,
+    "grid.alpha": 0.25,
+    "font.size": 10,
+    "legend.frameon": False,
+})
+
+NDSU_GREEN = "#005643"
+NDSU_GOLD  = "#FFC72C"
+ACCENT     = "#C1121F"
+```
+
+---
+
+## Why Not Just Use a Fully Connected Network?
+
+TODO
+
+## Convolution in 1D and 2D
+
+TODO
+
+## Channels, Stride, Padding, and Receptive Fields
+
+TODO
+
+## Pooling and Downsampling
+
+TODO
+
+## Classic Architectures: LeNet, AlexNet, VGG
+
+TODO
+
+## Residual Connections
+
+TODO
+
+## Batch Normalization
+
+TODO
+
+## Training a CNN in PyTorch
+
+TODO
+
+## Summary
+
+TODO
+
+---
+
+## Exercises
+
+Problem numbers refer to Prince, Chapters 10–11.
+
+**1.** TODO
+
+**2.** TODO
+
+**3. Computational.** TODO
+
+---
+
+## Further Reading
+
+- Prince, *Understanding Deep Learning*, Chapters 10–11.
+- TODO

@@ -1,0 +1,112 @@
+---
+title: "Large Language Models"
+subtitle: "Week 12 · November 10 & 12, 2026"
+description: "Pretraining, scaling laws, tokenization, rotary embeddings, and efficient inference."
+categories: [architectures]
+---
+
+::: {.lecture-meta}
+**Reading** Prince, *Understanding Deep Learning*, Chapter 12 and supplementary notes &nbsp;·&nbsp;
+**Assignment** A10, due Sunday, November 15; project progress update due November 12
+:::
+
+::: {.callout-warning appearance="simple"}
+These notes are still being written. The reading above is authoritative until
+this banner disappears.
+:::
+
+## Learning Objectives
+
+By the end of this week you should be able to:
+
+1. Describe the next-token-prediction objective and how pretraining data is assembled.
+2. Summarize what scaling laws predict and where they break down.
+3. Explain subword tokenization and byte-pair encoding.
+4. Describe rotary position embeddings and how they differ from sinusoidal encodings.
+5. Explain KV caching and the cost structure of autoregressive inference.
+6. Outline instruction tuning, RLHF, and parameter-efficient fine-tuning.
+
+```{python}
+#| label: setup
+#| code-fold: true
+#| code-summary: "Plotting setup (click to expand)"
+
+import numpy as np
+import matplotlib.pyplot as plt
+import torch
+
+torch.manual_seed(774)
+np.random.seed(774)
+
+plt.rcParams.update({
+    "figure.figsize": (7, 4),
+    "figure.dpi": 130,
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+    "axes.grid": True,
+    "grid.alpha": 0.25,
+    "font.size": 10,
+    "legend.frameon": False,
+})
+
+NDSU_GREEN = "#005643"
+NDSU_GOLD  = "#FFC72C"
+ACCENT     = "#C1121F"
+```
+
+---
+
+## From Transformers to Language Models
+
+TODO
+
+## Tokenization and Byte-Pair Encoding
+
+TODO
+
+## Pretraining Objectives
+
+TODO
+
+## Scaling Laws
+
+TODO
+
+## Rotary Position Embeddings
+
+TODO
+
+## Inference: KV Caching and Sampling
+
+TODO
+
+## Fine-Tuning, Instruction Tuning, and LoRA
+
+TODO
+
+## Capabilities and Limitations
+
+TODO
+
+## Summary
+
+TODO
+
+---
+
+## Exercises
+
+Problem numbers refer to Prince, Chapter 12 and supplementary notes.
+
+**1.** TODO
+
+**2.** TODO
+
+**3. Computational.** TODO
+
+---
+
+## Further Reading
+
+- Prince, *Understanding Deep Learning*, Chapter 12 and supplementary notes.
+- TODO

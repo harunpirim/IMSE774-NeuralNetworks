@@ -1,0 +1,48 @@
+# --- macOS / iCloud ---
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+*.icloud
+
+# --- Quarto ---
+/_site/
+/.quarto/
+/_freeze/
+*_files/
+*.tex
+!assets/tex/*.tex
+
+# --- Python ---
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.jupyter_cache/
+
+# --- Copyrighted course texts (do not distribute) ---
+UnderstandingDeepLearning*.pdf
+Prince_UDL_InstructorsManual*.pdf
+books/
+
+# --- Student work and graded material (FERPA) ---
+submissions/
+grades/
+*-grades.csv
+Midterm-MCQ.*
+
+# --- Legacy source files kept locally, not published ---
+lnotes/
+*.docx
+*.pages
+*.pptx
+*.webloc
+
+# --- Data and model artifacts ---
+data/raw/
+*.pt
+*.pth
+*.ckpt
+*.h5

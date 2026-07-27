@@ -1,0 +1,26 @@
+# Settings shared by every lecture note.
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    code-tools:
+      source: false
+      toggle: true
+  pdf:
+    number-sections: true
+    toc: true
+    toc-depth: 2
+
+author: "Harun Pirim"
+date-format: "MMMM D, YYYY"
+
+execute:
+  echo: true
+  warning: false
+  freeze: auto
+
+crossref:
+  eq-prefix: eq.
+  fig-prefix: fig.
+  tbl-prefix: table

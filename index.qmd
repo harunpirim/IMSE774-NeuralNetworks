@@ -1,0 +1,99 @@
+---
+title: "IME 774 — Neural Networks"
+subtitle: "North Dakota State University · Fall 2026"
+format:
+  html:
+    number-sections: false
+    toc: false
+---
+
+Welcome to IME 774. This site hosts the syllabus, schedule, and lecture notes for
+the course. Everything here is generated from the
+[course repository](https://github.com/harunpirim/IMSE774-NeuralNetworks) and is
+available as both a web page and a downloadable PDF.
+
+::: {.grid}
+
+::: {.g-col-12 .g-col-md-4}
+### Meeting
+
+Tuesday & Thursday
+12:30–1:45 p.m.
+Room TBA
+
+August 25 – December 10, 2026
+:::
+
+::: {.g-col-12 .g-col-md-4}
+### Instructor
+
+**Harun Pirim, PhD**
+Offerdahl 106
+[harun.pirim@ndsu.edu](mailto:harun.pirim@ndsu.edu)
+(701) 231-7285
+:::
+
+::: {.g-col-12 .g-col-md-4}
+### Textbook
+
+Simon J. D. Prince,
+*Understanding Deep Learning*,
+MIT Press, 2024.
+
+[Free from the author](https://udlbook.github.io/udlbook/)
+:::
+
+:::
+
+---
+
+## Start Here
+
+- **[Syllabus](syllabus.qmd)** — grading, policies, and key dates
+- **[Schedule](schedule.qmd)** — week-by-week topics and readings
+- **[Lecture notes](notes/03-shallow-networks.qmd)** — one page per topic, with runnable code
+
+## What This Course Covers
+
+We work through *Understanding Deep Learning* from the ground up: shallow and
+deep networks, how they are trained, how to tell whether they work, and then the
+architectures that define the modern field — convolutional networks,
+transformers and language models, graph neural networks, and generative models
+including VAEs, GANs, and diffusion.
+
+Every topic pairs the mathematics with a working PyTorch implementation. You
+will finish the semester having built and evaluated a deep learning system on a
+problem you chose yourself.
+
+## Assessment at a Glance
+
+| Component | Weight | Notes |
+|:---------------|-------:|:---------------------------------------|
+| Assignments | 30% | Roughly weekly, submitted as notebooks |
+| Midterm exam | 20% | In class, Thursday, October 22 |
+| Presentation | 20% | Recent paper, December 3 / 8 / 10 |
+| Project | 30% | Final report due Monday, December 14 |
+
+: {tbl-colwidths="[30,14,56]"}
+
+## Software Setup
+
+All coursework uses Python with PyTorch. You have two options.
+
+**Google Colab** — nothing to install, works in the browser, free GPUs. This is
+fine for every assignment in the course.
+
+**Local install** — clone the repository and create an environment:
+
+```bash
+git clone https://github.com/harunpirim/IMSE774-NeuralNetworks.git
+cd IMSE774-NeuralNetworks
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+::: {.callout-tip appearance="simple"}
+Found an error in the notes? Please
+[open an issue](https://github.com/harunpirim/IMSE774-NeuralNetworks/issues) —
+corrections are welcome and appreciated.
+:::

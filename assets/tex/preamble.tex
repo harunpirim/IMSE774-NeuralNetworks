@@ -1,0 +1,24 @@
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{longtable}
+
+% Under XeLaTeX/LuaLaTeX, Quarto's template loads unicode-math, which turns
+% \phi into a math-alphabet character that amsmath's \boldsymbol cannot bold
+% ("Improper alphabetic constant"). \symbf is the unicode-math equivalent.
+% Aliasing keeps a single \boldsymbol{...} spelling working in the .qmd source
+% for both HTML/MathJax and every PDF engine.
+\makeatletter
+\@ifpackageloaded{unicode-math}{%
+  \let\boldsymbol\symbf
+}{%
+  \usepackage{bm}%
+}
+\makeatother
+
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable}
+
+\definecolor{ndsugreen}{HTML}{005643}
+\definecolor{ndsugold}{HTML}{FFC72C}

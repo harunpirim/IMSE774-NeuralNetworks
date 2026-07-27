@@ -1,0 +1,819 @@
+---
+title: "Shallow Neural Networks"
+subtitle: "Week 3 · Sessions 5–6 · September 8 & 10, 2026"
+description: "One hidden layer, ReLU activations, linear regions, and the universal approximation theorem."
+categories: [foundations]
+---
+
+::: {.lecture-meta}
+**Reading** Prince, *Understanding Deep Learning*, Chapter 3 &nbsp;·&nbsp;
+**UDL notebooks** 3.1–3.4 &nbsp;·&nbsp;
+**Assignment** A2, due Sunday, September 13
+:::
+
+## Learning Objectives
+
+By the end of this week you should be able to:
+
+1. Write down a shallow network as an explicit equation and identify every parameter in it.
+2. Explain why a ReLU network computes a **continuous piecewise linear** function, and locate the joints.
+3. Count the linear regions a shallow network can produce, and explain why that count explodes with input dimension.
+4. State the universal approximation theorem precisely, and say what it does *not* promise.
+5. Generalize to multivariate inputs and outputs, and write the model in matrix form.
+6. Implement and fit a shallow network in PyTorch.
+
+```{python}
+#| label: setup
+#| code-fold: true
+#| code-summary: "Plotting setup (click to expand)"
+
+import numpy as np
+import matplotlib.pyplot as plt
+import torch
+
+torch.manual_seed(774)
+np.random.seed(774)
+
+plt.rcParams.update({
+    "figure.figsize": (7, 4),
+    "figure.dpi": 130,
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+    "axes.grid": True,
+    "grid.alpha": 0.25,
+    "font.size": 10,
+    "axes.titlesize": 11,
+    "axes.labelsize": 10,
+    "legend.frameon": False,
+})
+
+NDSU_GREEN = "#005643"
+NDSU_GOLD  = "#FFC72C"
+ACCENT     = "#C1121F"
+```
+
+---
+
+## Why We Need More Than a Line
+
+Chapter 2 gave us 1D linear regression, $y = \phi_0 + \phi_1 x$. It has exactly
+two parameters and it can only ever describe a straight line. That is a severe
+restriction: almost nothing we care about is linear.
+
+The fix is not to abandon linear functions but to **stack them around a
+nonlinearity**. A shallow network computes several linear functions of the
+input, bends each one with an activation function, and then takes a linear
+combination of the results. That single sandwich — linear, nonlinear, linear —
+is enough to approximate any continuous function.
+
+## The Example Network
+
+A shallow network is a function $y = f[x, \boldsymbol{\phi}]$ with parameters
+$\boldsymbol{\phi}$. Start with the smallest interesting case: scalar input,
+scalar output, three hidden units, ten parameters
+$\boldsymbol{\phi} = \{\phi_0, \phi_1, \phi_2, \phi_3, \theta_{10}, \theta_{11}, \theta_{20}, \theta_{21}, \theta_{30}, \theta_{31}\}$.
+
+$$
+y = f[x, \boldsymbol{\phi}] = \phi_0
+  + \phi_1\, a[\theta_{10} + \theta_{11}x]
+  + \phi_2\, a[\theta_{20} + \theta_{21}x]
+  + \phi_3\, a[\theta_{30} + \theta_{31}x].
+$$ {#eq-shallow-example}
+
+Read @eq-shallow-example in three steps:
+
+1. Compute three **linear functions** of the input: $\theta_{d0} + \theta_{d1}x$ for $d = 1, 2, 3$.
+2. Pass each through an **activation function** $a[\cdot]$.
+3. **Weight** the three results by $\phi_1, \phi_2, \phi_3$, sum them, and add the offset $\phi_0$.
+
+It is convenient to name the intermediate quantities. Define the **hidden units**
+
+$$
+h_1 = a[\theta_{10} + \theta_{11}x], \qquad
+h_2 = a[\theta_{20} + \theta_{21}x], \qquad
+h_3 = a[\theta_{30} + \theta_{31}x],
+$$ {#eq-hidden-units}
+
+and then the output is just a linear function of them:
+
+$$
+y = \phi_0 + \phi_1 h_1 + \phi_2 h_2 + \phi_3 h_3.
+$$ {#eq-output-linear}
+
+::: {.callout-note}
+## Notation
+Following Prince, $\theta_{d\bullet}$ are the parameters feeding *into* hidden
+unit $d$, and $\phi_\bullet$ are the parameters feeding *out of* the hidden
+layer into the output. The first subscript indexes the destination unit; the
+second indexes the source ($0$ means the offset). Square brackets $a[\cdot]$
+denote function application, reserving parentheses for grouping.
+:::
+
+### The ReLU
+
+The most common activation is the **rectified linear unit**:
+
+$$
+a[z] = \mathrm{ReLU}[z] = \begin{cases} 0 & z < 0 \\ z & z \geq 0 \end{cases}
+$$ {#eq-relu}
+
+It clips negative values to zero and passes positive values through unchanged.
+
+```{python}
+#| label: fig-relu
+#| fig-cap: "The ReLU clips negative inputs to zero and leaves positive inputs unchanged. The kink at the origin is the entire source of a ReLU network's nonlinearity."
+
+z = np.linspace(-4, 4, 400)
+fig, ax = plt.subplots(figsize=(5, 3))
+ax.plot(z, np.maximum(z, 0), color=NDSU_GREEN, lw=2.5)
+ax.axhline(0, color="k", lw=0.6)
+ax.axvline(0, color="k", lw=0.6)
+ax.set_xlabel("$z$")
+ax.set_ylabel("$a[z]$")
+ax.set_title("Rectified linear unit")
+plt.show()
+```
+
+The ReLU looks almost trivially simple, and that is the point. Because it is
+piecewise linear with a single kink, everything the network does downstream
+stays piecewise linear, and we can reason about the resulting function exactly.
+
+## Where the Bends Come From
+
+Here is the central picture of the chapter. We take @eq-shallow-example apart
+stage by stage and watch a piecewise linear function assemble itself.
+
+```{python}
+#| label: fig-decomposition
+#| fig-cap: "Building a shallow network's output from its parts. Top row: three linear functions of the input. Middle row: each one clipped by the ReLU. Bottom row: the clipped functions weighted by $\\phi_1, \\phi_2, \\phi_3$. Dotted lines mark the three joints."
+#| fig-height: 7
+
+theta = np.array([[0.36, -1.2],   # theta_10, theta_11  -> joint at x =  0.3
+                  [0.54,  0.9],   # theta_20, theta_21  -> joint at x = -0.6
+                  [0.63, -0.7]])  # theta_30, theta_31  -> joint at x =  0.9
+phi0 = 0.2
+phi  = np.array([1.0, -0.9, 0.6])
+
+x = np.linspace(-1.5, 1.5, 500)
+pre = theta[:, 0:1] + theta[:, 1:2] * x     # (3, 500) pre-activations
+act = np.maximum(pre, 0)                    # (3, 500) activations
+wgt = phi[:, None] * act                    # weighted activations
+y   = phi0 + wgt.sum(axis=0)
+
+joints = -theta[:, 0] / theta[:, 1]
+colors = [NDSU_GREEN, ACCENT, "#1864AB"]
+
+fig, axes = plt.subplots(3, 3, figsize=(9.5, 7.5), sharex=True)
+
+for d in range(3):
+    axes[0, d].plot(x, pre[d], color=colors[d], lw=2)
+    axes[0, d].axhline(0, color="k", lw=0.6)
+    axes[0, d].set_title(rf"$\theta_{{{d+1}0}} + \theta_{{{d+1}1}}x$")
+
+    axes[1, d].plot(x, act[d], color=colors[d], lw=2)
+    axes[1, d].set_title(rf"$h_{d+1} = a[\cdot]$")
+
+    axes[2, d].plot(x, wgt[d], color=colors[d], lw=2)
+    axes[2, d].axhline(0, color="k", lw=0.6)
+    axes[2, d].set_title(rf"$\phi_{d+1} h_{d+1}$")
+    axes[2, d].set_xlabel("$x$")
+
+for ax in axes.ravel():
+    for j in joints:
+        ax.axvline(j, color="gray", ls=":", lw=0.9)
+
+plt.tight_layout()
+plt.show()
+```
+
+```{python}
+#| label: fig-assembled
+#| fig-cap: "The final output: the three weighted, clipped functions summed together with the offset $\\phi_0$. Three hidden units produce three joints (gold markers) and therefore four linear regions. In the shaded region, $h_1$ and $h_3$ are active and $h_2$ is inactive."
+
+fig, ax = plt.subplots(figsize=(6.5, 3.6))
+ax.axvspan(x.min(), joints.min(), color=NDSU_GOLD, alpha=0.18, lw=0)
+ax.plot(x, y, color="k", lw=2.5)
+for j in joints:
+    ax.axvline(j, color="gray", ls=":", lw=1)
+    ax.plot(j, phi0 + np.sum(phi * np.maximum(theta[:, 0] + theta[:, 1] * j, 0)),
+            "o", color=NDSU_GOLD, ms=7, mec="k", mew=0.7, zorder=5)
+ax.set_xlabel("$x$"); ax.set_ylabel("$y$")
+ax.set_title("Output: four linear regions joined at three kinks")
+plt.show()
+```
+
+Three things to take away from @fig-decomposition and @fig-assembled:
+
+**Each hidden unit contributes exactly one joint.** The joint for unit $d$ sits
+where its pre-activation crosses zero, at $x = -\theta_{d0}/\theta_{d1}$. The
+ReLU is smooth everywhere else, so no other bends can appear.
+
+**Each linear region corresponds to an activation pattern.** In any given
+region, each hidden unit is either **active** (not clipped) or **inactive**
+(clipped to zero). Crossing a joint flips exactly one unit's status. With three
+units we get at most $3 + 1 = 4$ regions.
+
+**The slope in a region is the sum of contributions from the active units.** In
+the shaded region of @fig-assembled, units $1$ and $3$ are active and unit $2$ is
+inactive, so the slope there is $\theta_{11}\phi_1 + \theta_{31}\phi_3$. The
+offset $\phi_0$ never affects slope; it only slides the whole function up or
+down.
+
+Let me verify that claim numerically rather than asking you to take it on faith.
+
+```{python}
+#| label: slope-check
+
+def net(xv):
+    """The network of equation (1), evaluated at a scalar input."""
+    return phi0 + np.sum(phi * np.maximum(theta[:, 0] + theta[:, 1] * xv, 0))
+
+x0 = -1.0                                    # a point inside the shaded region
+active = (theta[:, 0] + theta[:, 1] * x0) > 0
+
+predicted = float(np.sum(theta[active, 1] * phi[active]))
+h = 1e-6
+measured = (net(x0 + h) - net(x0 - h)) / (2 * h)
+
+print(f"active units at x = {x0}       : {[int(d) for d in np.where(active)[0] + 1]}")
+print(f"slope from theory            : {predicted:.6f}")
+print(f"slope by central difference  : {measured:.6f}")
+```
+
+::: {.callout-important}
+## Only $D$ of the $D+1$ slopes are free
+With $D$ hidden units you get up to $D+1$ regions, but only $D$ of their slopes
+are independent. In the leftmost or rightmost region every unit may be inactive,
+giving slope zero; more generally the remaining slope is determined as a sum of
+the others. Capacity grows with hidden units, but not quite as fast as a naive
+count suggests.
+:::
+
+## Depicting Networks
+
+The equation and the picture are the same object. In the standard diagram the
+input sits on the left, hidden units in the middle, output on the right, and
+every arrow is one parameter: it multiplies its source and adds the result to
+its target.
+
+```{python}
+#| label: fig-diagram
+#| fig-cap: "The network of @eq-shallow-example drawn as a graph. Each of the ten arrows is one parameter. In practice the bias arrows and the parameter names are omitted, leaving the familiar circles-and-lines picture."
+#| code-fold: true
+
+fig, ax = plt.subplots(figsize=(6.5, 4))
+ax.axis("off")
+
+nodes = {"x": (0, 0.5), "h1": (1, 1.0), "h2": (1, 0.5), "h3": (1, 0.0), "y": (2, 0.5)}
+
+for src, dsts, labels in [("x", ["h1", "h2", "h3"],
+                           [r"$\theta_{11}$", r"$\theta_{21}$", r"$\theta_{31}$"])]:
+    for dst, lab in zip(dsts, labels):
+        x0, y0 = nodes[src]; x1, y1 = nodes[dst]
+        ax.annotate("", xy=(x1 - 0.09, y1), xytext=(x0 + 0.09, y0),
+                    arrowprops=dict(arrowstyle="->", color="k", lw=1.2))
+        ax.text((x0 + x1) / 2, (y0 + y1) / 2 + 0.06, lab, ha="center", fontsize=9)
+
+for src, lab in zip(["h1", "h2", "h3"], [r"$\phi_1$", r"$\phi_2$", r"$\phi_3$"]):
+    x0, y0 = nodes[src]; x1, y1 = nodes["y"]
+    ax.annotate("", xy=(x1 - 0.09, y1), xytext=(x0 + 0.09, y0),
+                arrowprops=dict(arrowstyle="->", color="k", lw=1.2))
+    ax.text((x0 + x1) / 2, (y0 + y1) / 2 + 0.06, lab, ha="center", fontsize=9)
+
+for name, (px, py) in nodes.items():
+    is_hidden = name.startswith("h")
+    face = NDSU_GOLD if is_hidden else "white"
+    ax.add_patch(plt.Circle((px, py), 0.09, fc=face, ec="k", lw=1.3, zorder=3))
+    label = f"$h_{name[1]}$" if is_hidden else f"${name}$"
+    ax.text(px, py, label, ha="center", va="center", fontsize=10, zorder=4)
+
+ax.text(0, 0.78, "input\nlayer", ha="center", fontsize=9, color="gray")
+ax.text(1, 1.28, "hidden layer", ha="center", fontsize=9, color="gray")
+ax.text(2, 0.78, "output\nlayer", ha="center", fontsize=9, color="gray")
+
+ax.set_xlim(-0.35, 2.35); ax.set_ylim(-0.3, 1.45)
+plt.show()
+```
+
+## The Universal Approximation Theorem
+
+Generalize to $D$ hidden units. The $d$-th hidden unit is
+
+$$
+h_d = a[\theta_{d0} + \theta_{d1}x],
+$$ {#eq-hd}
+
+and the output combines them linearly:
+
+$$
+y = \phi_0 + \sum_{d=1}^{D} \phi_d h_d.
+$$ {#eq-y-sum}
+
+The number of hidden units $D$ measures the network's **capacity**. With ReLU
+activations the output has at most $D$ joints, hence at most $D+1$ linear
+regions.
+
+The argument for universality is now almost visual. Every hidden unit you add
+buys one more linear region. More regions means each one covers a shorter
+stretch of the input, and any continuous function looks like a straight line if
+you zoom in far enough.
+
+::: {.callout-tip}
+## Universal approximation theorem
+For any continuous function $f$ on a compact subset of $\mathbb{R}^{D_i}$ and any
+$\epsilon > 0$, there **exists** a shallow network with finitely many hidden
+units whose output is within $\epsilon$ of $f$ everywhere on that set.
+:::
+
+```{python}
+#| label: fig-approx
+#| fig-cap: "A fixed target function (dashed) approximated by piecewise linear models with an increasing number of regions. The approximation error shrinks steadily as capacity grows."
+
+def target(x):
+    return np.sin(3 * x) + 0.35 * x**2
+
+xs = np.linspace(-2, 2, 1000)
+fig, axes = plt.subplots(1, 3, figsize=(10, 3.1), sharey=True)
+
+for ax, n_regions in zip(axes, [3, 7, 20]):
+    knots = np.linspace(-2, 2, n_regions + 1)
+    approx = np.interp(xs, knots, target(knots))
+    err = np.max(np.abs(approx - target(xs)))
+    ax.plot(xs, target(xs), "--", color="gray", lw=1.8, label="target")
+    ax.plot(xs, approx, color=NDSU_GREEN, lw=2, label="piecewise linear")
+    ax.plot(knots, target(knots), "o", color=NDSU_GOLD, ms=4, mec="k", mew=0.5)
+    ax.set_title(f"{n_regions} regions · max error {err:.3f}")
+    ax.set_xlabel("$x$")
+
+axes[0].set_ylabel("$y$")
+axes[0].legend(loc="upper left", fontsize=8)
+plt.tight_layout()
+plt.show()
+```
+
+::: {.callout-warning}
+## What the theorem does not say
+It is an **existence** result, and that is all. It does not tell you how many
+hidden units you need (it can be astronomically many), it does not tell you how
+to find the parameters, and it says nothing about whether gradient descent will
+find them or whether the result will generalize to new data. Depth, which we
+take up in Chapter 4, is what makes universality *practical*.
+:::
+
+## Multivariate Inputs and Outputs
+
+### Multiple outputs
+
+To predict several outputs, use a different linear function of the same hidden
+units for each one. With four hidden units and two outputs:
+
+$$
+\begin{aligned}
+y_1 &= \phi_{10} + \phi_{11}h_1 + \phi_{12}h_2 + \phi_{13}h_3 + \phi_{14}h_4 \\
+y_2 &= \phi_{20} + \phi_{21}h_1 + \phi_{22}h_2 + \phi_{23}h_3 + \phi_{24}h_4
+\end{aligned}
+$$ {#eq-multi-out}
+
+Because both outputs read from the *same* hidden units, their joints are locked
+to the same input locations. The slopes and heights can differ freely; the
+positions of the kinks cannot.
+
+```{python}
+#| label: fig-shared-joints
+#| fig-cap: "Two outputs computed from four shared hidden units. The joints (dotted lines) occur at identical input locations for both outputs, because they are determined by the hidden layer alone."
+
+#            joints at x = -1.0,      -0.3,       0.4,        1.0
+th = np.array([[-1.4, -1.4], [0.33, 1.1], [-0.64, 1.6], [0.7, -0.7]])
+Phi = np.array([[0.1, 1.0, -0.8, 0.5, 0.9],     # phi_10 ... phi_14
+                [-0.3, -0.6, 1.2, 0.4, -1.1]])  # phi_20 ... phi_24
+
+x = np.linspace(-1.5, 1.5, 600)
+H = np.maximum(th[:, 0:1] + th[:, 1:2] * x, 0)
+Y = Phi[:, 0:1] + Phi[:, 1:] @ H
+joints4 = -th[:, 0] / th[:, 1]
+
+fig, ax = plt.subplots(figsize=(6.5, 3.6))
+ax.plot(x, Y[0], color=NDSU_GREEN, lw=2.2, label="$y_1[x]$")
+ax.plot(x, Y[1], color=ACCENT, lw=2.2, label="$y_2[x]$")
+for j in joints4:
+    ax.axvline(j, color="gray", ls=":", lw=1)
+ax.set_xlabel("$x$"); ax.set_ylabel("output"); ax.legend()
+ax.set_title("Shared hidden units force shared joint locations")
+plt.show()
+```
+
+### Multiple inputs
+
+With two inputs each hidden unit takes a linear combination of both:
+
+$$
+h_d = a[\theta_{d0} + \theta_{d1}x_1 + \theta_{d2}x_2].
+$$ {#eq-2d-hidden}
+
+Geometrically, $\theta_{d0} + \theta_{d1}x_1 + \theta_{d2}x_2$ is an oriented
+plane over the input space. The ReLU clips it along the line where it crosses
+zero. Summing several clipped planes gives a continuous surface made of **convex
+polygonal regions**, with a different linear function on each.
+
+```{python}
+#| label: fig-2d
+#| fig-cap: "A shallow network with two inputs, three hidden units, and one output. Left three panels: each hidden unit's activation, a plane clipped along a line. Right: the weighted sum, a continuous surface of convex polygonal linear regions. The cyan lines are the clipping boundaries carried over from the hidden units."
+#| fig-height: 3.2
+
+th2 = np.array([[-0.3,  1.0,  0.6],
+                [ 0.2, -0.8,  1.1],
+                [-0.5, -0.7, -1.0]])
+ph2 = np.array([0.1, 1.0, -0.8, 0.9])
+
+g = np.linspace(-2, 2, 300)
+X1, X2 = np.meshgrid(g, g)
+Hs = [np.maximum(t[0] + t[1] * X1 + t[2] * X2, 0) for t in th2]
+Z  = ph2[0] + sum(w * h for w, h in zip(ph2[1:], Hs))
+
+fig, axes = plt.subplots(1, 4, figsize=(12, 3.1))
+for d, (ax, h) in enumerate(zip(axes[:3], Hs)):
+    ax.imshow(h, extent=[-2, 2, -2, 2], origin="lower", cmap="viridis")
+    ax.contour(X1, X2, th2[d, 0] + th2[d, 1] * X1 + th2[d, 2] * X2,
+               levels=[0], colors="cyan", linewidths=1.8)
+    ax.set_title(f"$h_{d+1}$"); ax.set_xlabel("$x_1$"); ax.grid(False)
+    if d == 0:
+        ax.set_ylabel("$x_2$")
+
+axes[3].imshow(Z, extent=[-2, 2, -2, 2], origin="lower", cmap="magma")
+for d in range(3):
+    axes[3].contour(X1, X2, th2[d, 0] + th2[d, 1] * X1 + th2[d, 2] * X2,
+                    levels=[0], colors="cyan", linewidths=1.2, alpha=0.8)
+axes[3].set_title("$y$ (weighted sum)"); axes[3].set_xlabel("$x_1$"); axes[3].grid(False)
+
+plt.tight_layout()
+plt.show()
+```
+
+Notice how the three cyan lines partition the plane into regions, and how the
+output surface is flat within each region. That is the two-dimensional version
+of the same story: **hyperplanes carve the input space, and each cell gets its
+own linear function.**
+
+### Regions explode with dimension
+
+Each hidden unit defines one hyperplane separating where it is active from where
+it is not. If we had exactly $D_i$ hidden units for $D_i$ input dimensions and
+aligned each hyperplane with a coordinate axis, we would carve out $2^{D_i}$
+orthants. Real networks have more hidden units than input dimensions, so they do
+better than that.
+
+The exact maximum number of regions for $D$ hidden units in $D_i$ dimensions is
+
+$$
+N_r = \sum_{j=0}^{D_i} \binom{D}{j}.
+$$ {#eq-regions}
+
+```{python}
+#| label: fig-regions
+#| fig-cap: "Maximum number of linear regions as a function of hidden units, for several input dimensionalities. Both axes are logarithmic. Capacity measured this way grows explosively in high dimensions."
+
+from math import comb
+
+D_units = np.arange(1, 501)
+fig, ax = plt.subplots(figsize=(6.5, 3.8))
+
+for Di, c in zip([1, 5, 10, 50, 100], plt.cm.viridis(np.linspace(0.1, 0.9, 5))):
+    regions = [sum(comb(int(D), j) for j in range(0, min(Di, int(D)) + 1)) for D in D_units]
+    ax.plot(D_units, regions, color=c, lw=2, label=f"$D_i = {Di}$")
+
+ax.set_xscale("log"); ax.set_yscale("log")
+ax.set_xlabel("hidden units $D$")
+ax.set_ylabel("max linear regions $N_r$")
+ax.set_title("Linear regions vs. hidden units")
+ax.legend(fontsize=8)
+plt.show()
+
+n_regions = sum(comb(500, j) for j in range(0, 101))
+n_params  = 500 * (100 + 1) + (500 + 1)
+print(f"D = 500 hidden units, D_i = 100 inputs")
+print(f"  parameters     : {n_params:,}")
+print(f"  linear regions : ~1e{np.log10(float(n_regions)):.0f}")
+```
+
+A network with 51,001 parameters is tiny by modern standards, yet it can in
+principle express a function with more than $10^{107}$ distinct linear pieces.
+Expressivity is clearly not the bottleneck in deep learning; optimization and
+generalization are.
+
+## The General Case
+
+A shallow network $y = f[\mathbf{x}, \boldsymbol{\phi}]$ maps
+$\mathbf{x} \in \mathbb{R}^{D_i}$ to $\mathbf{y} \in \mathbb{R}^{D_o}$ through
+$D$ hidden units:
+
+$$
+h_d = a\!\left[\theta_{d0} + \sum_{i=1}^{D_i} \theta_{di} x_i\right],
+\qquad
+y_j = \phi_{j0} + \sum_{d=1}^{D} \phi_{jd} h_d.
+$$ {#eq-general}
+
+In matrix form this collapses to two lines. With
+$\boldsymbol{\Theta} \in \mathbb{R}^{D \times D_i}$,
+$\boldsymbol{\theta}_0 \in \mathbb{R}^{D}$,
+$\boldsymbol{\Phi} \in \mathbb{R}^{D_o \times D}$, and
+$\boldsymbol{\phi}_0 \in \mathbb{R}^{D_o}$:
+
+$$
+\mathbf{h} = a[\boldsymbol{\theta}_0 + \boldsymbol{\Theta}\mathbf{x}],
+\qquad
+\mathbf{y} = \boldsymbol{\phi}_0 + \boldsymbol{\Phi}\mathbf{h}.
+$$ {#eq-matrix}
+
+The activation function is applied elementwise. Total parameter count:
+$D(D_i + 1) + D_o(D + 1)$.
+
+::: {.callout-important}
+## The activation must be nonlinear
+If $a[\cdot]$ were the identity, then
+$\mathbf{y} = \boldsymbol{\phi}_0 + \boldsymbol{\Phi}(\boldsymbol{\theta}_0 + \boldsymbol{\Theta}\mathbf{x})$,
+which is just another affine map $\mathbf{x} \mapsto \mathbf{A}\mathbf{x} + \mathbf{b}$.
+Every hidden layer would collapse and you would be back to linear regression, no
+matter how many units you used.
+:::
+
+Let me confirm that collapse rather than just assert it.
+
+```{python}
+#| label: linear-collapse
+
+Di, D, Do = 4, 32, 2
+Theta, theta0 = torch.randn(D, Di), torch.randn(D)
+Phi,   phi0   = torch.randn(Do, D), torch.randn(Do)
+
+x_test = torch.randn(6, Di)
+
+# Identity "activation": the composition is affine.
+h_lin = x_test @ Theta.T + theta0
+y_lin = h_lin @ Phi.T + phi0
+
+# The equivalent single affine map, computed directly.
+A = Phi @ Theta
+b = Phi @ theta0 + phi0
+y_affine = x_test @ A.T + b
+
+print("max |two-layer linear  -  single affine map| =",
+      float((y_lin - y_affine).abs().max()))
+```
+
+The difference is at the level of floating-point noise: the two-layer linear
+network *is* a one-layer linear network.
+
+## Terminology
+
+Neural networks carry a great deal of jargon. The vocabulary below is worth
+memorizing because everything later in the course assumes it.
+
+| Term | Meaning |
+|:--------------------|:-----------------------------------------------------|
+| **Input layer** | The inputs $\mathbf{x}$ |
+| **Hidden layer** | The units $\mathbf{h}$ between input and output |
+| **Output layer** | The predictions $\mathbf{y}$ |
+| **Neuron / hidden unit** | A single element of $\mathbf{h}$ |
+| **Pre-activation** | The value *before* the activation function is applied |
+| **Activation** | The value *after* the activation function is applied |
+| **Weights** | Slope parameters (the arrows in the diagram) |
+| **Biases** | Offset parameters $\theta_{d0}$, $\phi_{j0}$ |
+| **Shallow network** | Exactly one hidden layer |
+| **Deep network** | More than one hidden layer |
+| **MLP** | Multi-layer perceptron: any network with $\geq 1$ hidden layer |
+| **Feed-forward** | Connections form an acyclic graph |
+| **Fully connected** | Every unit in a layer connects to every unit in the next |
+
+: {tbl-colwidths="[26,74]"}
+
+## Beyond the ReLU
+
+The ReLU dominates in practice, but it has a real flaw. Its derivative is zero
+for negative inputs, so if every training example drives a given unit negative,
+the gradient with respect to that unit's incoming weights is flat and it can
+never recover. This is the **dying ReLU problem**. Most alternatives are attempts
+to fix it while keeping the ReLU's stable gradient for positive inputs.
+
+```{python}
+#| label: fig-activations
+#| fig-cap: "A selection of activation functions. The saturating sigmoid and tanh were standard before roughly 2010; their near-zero gradients at large magnitudes make deep networks hard to train. The ReLU family and the smooth variants avoid that saturation on the positive side."
+
+z = np.linspace(-4, 4, 500)
+acts = {
+    "ReLU":       np.maximum(z, 0),
+    "Leaky ReLU": np.where(z > 0, z, 0.1 * z),
+    "sigmoid":    1 / (1 + np.exp(-z)),
+    "tanh":       np.tanh(z),
+    "SoftPlus":   np.log1p(np.exp(z)),
+    "GELU":       z * 0.5 * (1 + np.tanh(np.sqrt(2 / np.pi) * (z + 0.044715 * z**3))),
+}
+
+fig, axes = plt.subplots(1, 2, figsize=(9.5, 3.2), sharex=True)
+for name in ["sigmoid", "tanh"]:
+    axes[0].plot(z, acts[name], lw=2, label=name)
+axes[0].set_title("Saturating"); axes[0].legend()
+
+for name in ["ReLU", "Leaky ReLU", "SoftPlus", "GELU"]:
+    axes[1].plot(z, acts[name], lw=2, label=name)
+axes[1].set_title("Non-saturating (positive side)"); axes[1].legend()
+
+for ax in axes:
+    ax.axhline(0, color="k", lw=0.6); ax.axvline(0, color="k", lw=0.6)
+    ax.set_xlabel("$z$")
+axes[0].set_ylabel("$a[z]$")
+plt.tight_layout()
+plt.show()
+```
+
+There is no definitive winner. Leaky ReLU, parametric ReLU, and the smooth
+variants give minor gains in particular settings. We stay with the plain ReLU for
+most of this course because it makes the piecewise linear geometry easy to
+characterize.
+
+## Building One in PyTorch
+
+Everything above is one `nn.Sequential` call. Below we fit a shallow network to
+noisy samples of a nonlinear function and then inspect the piecewise linear
+structure of the trained model.
+
+```{python}
+#| label: pytorch-fit
+
+import torch.nn as nn
+
+# --- data ------------------------------------------------------------------
+def f_true(x):
+    return np.sin(3 * x) + 0.35 * x**2
+
+x_train = np.random.uniform(-2, 2, 200)
+y_train = f_true(x_train) + np.random.normal(0, 0.12, x_train.shape)
+
+X = torch.tensor(x_train, dtype=torch.float32).unsqueeze(1)
+Y = torch.tensor(y_train, dtype=torch.float32).unsqueeze(1)
+
+# --- model: exactly equation (3.11)-(3.12) with D_i = D_o = 1 --------------
+D = 12
+model = nn.Sequential(
+    nn.Linear(1, D),   # Theta and theta_0
+    nn.ReLU(),         # a[.]
+    nn.Linear(D, 1),   # Phi and phi_0
+)
+
+n_params = sum(p.numel() for p in model.parameters())
+print(f"hidden units D = {D},  parameters = {n_params}  "
+      f"(formula: D(Di+1) + Do(D+1) = {D * 2 + 1 * (D + 1)})")
+
+# --- fit -------------------------------------------------------------------
+opt = torch.optim.Adam(model.parameters(), lr=0.05)
+loss_fn = nn.MSELoss()
+
+history = []
+for epoch in range(3000):
+    opt.zero_grad()
+    loss = loss_fn(model(X), Y)
+    loss.backward()
+    opt.step()
+    history.append(loss.item())
+
+print(f"final training MSE = {history[-1]:.5f}")
+```
+
+```{python}
+#| label: fig-fit
+#| fig-cap: "Left: a 12-unit shallow network fitted to noisy data. The learned function is visibly piecewise linear, with joints (gold markers) placed where the network needs curvature. Right: the training loss."
+
+with torch.no_grad():
+    xg = torch.linspace(-2.2, 2.2, 800).unsqueeze(1)
+    yg = model(xg).squeeze().numpy()
+    xg_np = xg.squeeze().numpy()
+
+    # Joints live where each hidden unit's pre-activation crosses zero.
+    W1 = model[0].weight.squeeze().numpy()
+    b1 = model[0].bias.numpy()
+    learned_joints = -b1 / W1
+    learned_joints = learned_joints[(learned_joints > -2.2) & (learned_joints < 2.2)]
+
+fig, axes = plt.subplots(1, 2, figsize=(10, 3.4))
+
+axes[0].scatter(x_train, y_train, s=10, color="gray", alpha=0.55, label="data")
+axes[0].plot(xg_np, f_true(xg_np), "--", color=ACCENT, lw=1.6, label="true function")
+axes[0].plot(xg_np, yg, color=NDSU_GREEN, lw=2.2, label="network")
+axes[0].plot(learned_joints, np.interp(learned_joints, xg_np, yg), "o",
+             color=NDSU_GOLD, ms=6, mec="k", mew=0.6, label="joints", zorder=5)
+axes[0].set_xlabel("$x$"); axes[0].set_ylabel("$y$")
+axes[0].set_title(f"{D} hidden units, {len(learned_joints)} joints in range")
+axes[0].legend(fontsize=8)
+
+axes[1].plot(history, color=NDSU_GREEN, lw=1.5)
+axes[1].set_yscale("log")
+axes[1].set_xlabel("epoch"); axes[1].set_ylabel("MSE")
+axes[1].set_title("Training loss")
+
+plt.tight_layout()
+plt.show()
+```
+
+The joints are not spread evenly. Training pushed them toward the parts of the
+curve that bend the most, which is exactly what you want a limited budget of
+linear regions to do.
+
+### Capacity in action
+
+Increasing $D$ increases the number of available regions, and with it the
+model's ability to follow the data — including the noise.
+
+```{python}
+#| label: fig-capacity
+#| fig-cap: "The same data fitted with 3, 12, and 100 hidden units. Too few regions and the model cannot bend enough; too many and it begins tracing the noise. Chapters 8 and 9 make this trade-off precise."
+
+def fit_shallow(D, epochs=2500, seed=0):
+    torch.manual_seed(seed)
+    m = nn.Sequential(nn.Linear(1, D), nn.ReLU(), nn.Linear(D, 1))
+    o = torch.optim.Adam(m.parameters(), lr=0.05)
+    for _ in range(epochs):
+        o.zero_grad(); nn.MSELoss()(m(X), Y).backward(); o.step()
+    return m
+
+fig, axes = plt.subplots(1, 3, figsize=(10.5, 3.1), sharey=True)
+for ax, D_try in zip(axes, [3, 12, 100]):
+    m = fit_shallow(D_try)
+    with torch.no_grad():
+        yy = m(xg).squeeze().numpy()
+        mse = nn.MSELoss()(m(X), Y).item()
+    ax.scatter(x_train, y_train, s=8, color="gray", alpha=0.45)
+    ax.plot(xg_np, yy, color=NDSU_GREEN, lw=2)
+    ax.set_title(f"$D = {D_try}$ · MSE {mse:.4f}")
+    ax.set_xlabel("$x$")
+axes[0].set_ylabel("$y$")
+plt.tight_layout()
+plt.show()
+```
+
+## Summary
+
+A shallow network has one hidden layer. It (i) computes several linear functions
+of the input, (ii) passes each through a nonlinear activation, and (iii) takes a
+linear combination of the results to form the outputs.
+
+With ReLU activations the result is a **continuous piecewise linear** function.
+Hyperplanes defined by the hidden units carve the input space into convex
+polytopes, and each polytope carries its own linear function. The polytopes are
+shared across all outputs; the linear functions on them are not.
+
+Capacity is set by the number of hidden units. With enough of them a shallow
+network can approximate any continuous function on a compact set to arbitrary
+precision — but the theorem is silent on how many units that takes, and on
+whether training will find them.
+
+**Next:** Chapter 4 stacks hidden layers. The striking result is that depth buys
+linear regions *exponentially* faster than width does, which is a large part of
+why "deep" learning rather than "wide" learning is what took off.
+
+---
+
+## Exercises
+
+::: {.callout-note appearance="minimal"}
+Problem numbers refer to Prince, Chapter 3. Solutions to odd-numbered problems
+are on the [UDL website](https://udlbook.github.io/udlbook/).
+:::
+
+**1. (UDL 3.1)** What kind of mapping from input to output would be created if
+the activation function in @eq-shallow-example were linear, $a[z] = \psi_0 + \psi_1 z$?
+What if the activation were removed entirely, so $a[z] = z$?
+
+**2. (UDL 3.3)** For the shaded region of @fig-assembled, show that the slope is
+$\theta_{11}\phi_1 + \theta_{31}\phi_3$ and the y-intercept is
+$\phi_0 + \phi_1\theta_{10} + \phi_3\theta_{30}$.
+
+**3. (UDL 3.10)** Consider a network with one input, one output, and $D$ hidden
+units. Prove that the maximum number of linear regions is $D + 1$, and give a
+parameter setting that achieves it.
+
+**4. (UDL 3.11)** How many parameters does a network with two inputs, one hidden
+layer of twenty units, and three outputs have? Verify your answer with
+`sum(p.numel() for p in model.parameters())`.
+
+**5. Computational.** Modify the PyTorch example to use `nn.Sigmoid()` instead of
+`nn.ReLU()`. Is the fitted function still piecewise linear? Locate the "joints" —
+or explain why the question no longer makes sense.
+
+**6. Computational.** Fix $D = 8$ and train the same model from five different
+random seeds. Plot all five fitted functions on one axis. Do the joints end up in
+the same places? What does that tell you about the loss surface, given that
+Chapter 6 has not happened yet?
+
+**7. Extension.** Implement @eq-regions and verify empirically for $D_i = 2$ that a
+randomly initialized network with $D = 5$ hidden units produces the predicted
+maximum number of regions. Sample the input plane densely and count distinct
+activation patterns.
+
+---
+
+## Further Reading
+
+- Prince, *Understanding Deep Learning*, Chapter 3 and the notes at the end of it.
+- UDL notebooks 3.1 (shallow networks I), 3.2 (shallow networks II), 3.3 (shallow network regions), 3.4 (activation functions).
+- Cybenko (1989) and Hornik (1991) — the original universal approximation results.
+- Montúfar et al. (2014), *On the number of linear regions of deep neural networks* — the counting argument behind @eq-regions.
+- Nair & Hinton (2010) — the paper that put ReLUs into the mainstream.

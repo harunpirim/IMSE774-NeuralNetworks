@@ -1,0 +1,266 @@
+---
+title: "IME 774 — Neural Networks"
+subtitle: "Fall 2026 Syllabus · 3 credits"
+author: "Harun Pirim, PhD"
+date: "2026-08-25"
+date-format: "MMMM D, YYYY"
+format:
+  html:
+    toc-depth: 2
+    number-sections: false
+  pdf:
+    number-sections: false
+    toc: false
+---
+
+## Course Information
+
+| | |
+|:---------------------|:-------------------------------------------------|
+| **Course** | IME 774 — Neural Networks (3 credits) |
+| **Term** | Fall 2026 |
+| **Meeting time** | Tuesday & Thursday, 12:30–1:45 p.m. |
+| **Room** | TBA |
+| **Course website** | <https://harunpirim.github.io/IMSE774-NeuralNetworks/> |
+| **Learning management** | Blackboard Ultra |
+| **Cross-listed as** | PSYC 735 and CSCI 735 |
+| **Prerequisite** | Graduate standing |
+
+: {tbl-colwidths="[28,72]"}
+
+### Instructor
+
+| | |
+|:---------------------|:-------------------------------------------------|
+| **Name** | Harun Pirim, PhD |
+| **Office** | Offerdahl 106 |
+| **Phone** | (701) 231-7285 |
+| **Email** | [harun.pirim@ndsu.edu](mailto:harun.pirim@ndsu.edu) |
+| **Office hours** | TBA, or by appointment via email |
+
+: {tbl-colwidths="[28,72]"}
+
+### Textbook
+
+Simon J. D. Prince, *Understanding Deep Learning*, MIT Press, 2024.
+
+The book is freely available from the author at
+<https://udlbook.github.io/udlbook/>, which also hosts the accompanying Python
+notebooks. Lecture notes on the course website follow the book's chapter
+structure and notation, so you can read the two side by side.
+
+**Supplementary references**
+
+- Michael Nielsen, *Neural Networks and Deep Learning* — <http://neuralnetworksanddeeplearning.com/>
+- Goodfellow, Bengio & Courville, *Deep Learning*, MIT Press, 2016 — <https://www.deeplearningbook.org/>
+- Recent papers distributed through Blackboard during the semester.
+
+---
+
+## Course Description
+
+This course provides an in-depth exploration of neural networks, with a strong
+focus on deep learning. Students will learn fundamental concepts, including
+shallow and deep neural networks, optimization techniques, loss functions, and
+performance evaluation. The course covers key architectures such as
+Convolutional Neural Networks (CNNs), Transformers, Large Language Models
+(LLMs), Graph Neural Networks (GNNs), and generative models including
+Variational Autoencoders (VAEs), Generative Adversarial Networks (GANs), and
+diffusion models. Emphasis is placed on practical applications, with
+Python-based implementation, assignments, and a hands-on project aimed at
+solving real-world problems. Students will also engage in critical analysis of
+recent research in the field.
+
+## Course Objectives
+
+Graduate students will be introduced to contemporary topics in neural networks,
+with a focus on deep learning. Both shallow and deep networks will be covered,
+including matrix notation, loss functions, model fitting, performance
+measurement, and regularization techniques. The course also explores
+convolutional networks, transformers and language models, graph neural
+networks, and modern generative models. Students will learn to distinguish
+different architectures designed for specific data types such as images, text,
+and graphs. Python code is provided for hands-on experience. Through
+assignments, a paper presentation, and a course project, students gain
+practical experience applying the architectures covered.
+
+## Learning Outcomes
+
+By the end of this course, students will be able to:
+
+1. Comprehend the fundamental concepts and architectures of neural networks.
+2. Model applications across different data types, including tabular, image, text, and graph data.
+3. Analyze and evaluate neural network models using appropriate performance measures.
+4. Design and apply a neural network project to solve a unique real-world problem.
+
+---
+
+## Assessment
+
+### Assignments (30%)
+
+Roughly weekly assignments reinforce the concepts from lecture and apply them to
+datasets. Assignments are distributed as Jupyter notebooks and submitted through
+Blackboard. Unless stated otherwise, assignments are due at 11:59 p.m. on the
+Sunday following the week they are posted.
+
+### Midterm Exam (20%)
+
+A computer-based, in-class exam on **Thursday, October 22, 2026**, covering all
+topics through Chapter 9 (regularization). Bring a laptop; let the instructor
+know in advance if you do not have one available.
+
+### Paper Presentation (20%)
+
+Each student presents a recent paper, discussing the novelty of its ideas and
+possible directions for future research. Presentations take place on
+**December 3, 8, and 10, 2026**. Paper selections must be approved by
+**Thursday, November 5, 2026**. A grading rubric will be posted on Blackboard.
+
+### Project (30%)
+
+The project requires students to apply deep learning to a real-world problem.
+Students may work individually or in groups of at most two. The report is
+written in the format of a conference or journal paper. A detailed description
+and grading rubric will be posted on Blackboard.
+
+| Milestone | Due date |
+|:----------------------------|:-----------------------------|
+| Project proposal (1–2 pages) | Thursday, October 8, 2026 |
+| Progress update | Thursday, November 12, 2026 |
+| Final report | **Monday, December 14, 2026** |
+
+: {tbl-colwidths="[55,45]"}
+
+### Grade Breakdown
+
+| Course requirement | Percentage of grade |
+|:--------------------|--------------------:|
+| Assignments | 30% |
+| Midterm exam | 20% |
+| Presentation | 20% |
+| Project | 30% |
+| **Total** | **100%** |
+
+: {tbl-colwidths="[60,40]"}
+
+Letter grades follow a traditional 10-point scale: 90–100% = A, 80–89.99% = B,
+70–79.99% = C, 60–69.99% = D, below 60% = F.
+
+**No make-up exams** will be given for any reason except university-excused
+absences.
+
+---
+
+## Important Dates
+
+| Date | Event |
+|:------------------------|:-----------------------------------------------|
+| Tuesday, August 25 | First day of class |
+| Thursday, October 8 | Project proposal due |
+| Thursday, October 22 | **Midterm exam (in class)** |
+| Thursday, November 5 | Presentation paper selection due |
+| Friday, November 13 | Last day to drop with a 'W' (NDSU deadline) |
+| Thursday, November 12 | Project progress update due |
+| Thursday, November 26 | **No class — Thanksgiving** |
+| Dec 3, 8, 10 | Student presentations |
+| Thursday, December 10 | Last class meeting |
+| Monday, December 14 | **Final project report due** |
+
+: {tbl-colwidths="[32,68]"}
+
+A full week-by-week schedule with topics and readings is on the
+[Schedule](schedule.qmd) page.
+
+---
+
+## Course Policies
+
+### Attendance
+
+According to [NDSU Policy 333](https://www.ndsu.edu/fileadmin/policy/333.pdf),
+attendance in classes is expected. PointSolutions software will be used to
+record attendance; it opens at the beginning of class and closes at the end. No
+make-up assignments, tests, or project deadlines will be given for any reason
+except university-excused absences. See NDSU Policy 333 for faculty and student
+responsibilities related to attendance, including for university-sponsored
+activities. Veterans and student service members with special circumstances, or
+who are activated, are encouraged to notify the instructor as soon as possible
+and to provide activation orders.
+
+### Students with Special Needs
+
+Any students with disabilities or other special needs who need accommodations in
+this course are invited to share these concerns or requests with the instructor
+and to contact the
+[Disability Services Office](https://www.ndsu.edu/disabilityservices) as soon as
+possible.
+
+### FERPA
+
+Your personally identifiable information and educational records as they relate
+to this course are subject to FERPA.
+
+### Academic Honesty
+
+The academic community operates on the basis of honesty, integrity, and fair
+play. NDSU Policy 335: Code of Academic Responsibility and Conduct applies to
+cases in which cheating, plagiarism, or other academic misconduct have occurred
+in an instructional context. Students found guilty of academic misconduct are
+subject to penalties, up to and possibly including suspension and/or expulsion.
+Student academic misconduct records are maintained by the Office of Registration
+and Records. Informational resources about academic honesty for students and
+instructional staff can be found at
+<https://www.ndsu.edu/academichonesty>.
+
+### AI Usage Policy
+
+AI tools (e.g., ChatGPT, code generators) may be used to support your learning by
+helping you understand concepts, explore ideas, or draft code. However, the work
+you submit must represent your own understanding and effort.
+
+- **Critical review.** You are responsible for carefully reviewing,
+  understanding, and — if needed — modifying any AI-generated content before
+  including it in your work.
+- **Acknowledgment.** If AI significantly contributes to your work, you must
+  include a short statement explaining how you used it and to what extent.
+- **Accuracy and responsibility.** You are accountable for checking the
+  accuracy, quality, and relevance of AI-generated content. Blind reliance on AI
+  is not acceptable and will not excuse mistakes.
+- **Integrity.** All use of AI must follow academic integrity standards. Misuse
+  — including plagiarism, misrepresentation, or other dishonest practices — will
+  be treated as an academic integrity violation and may result in disciplinary
+  action.
+
+Use AI as a learning aid, not a shortcut. The goal is for you to build your own
+understanding and skills while using AI responsibly and transparently.
+
+**AI acknowledgment statement** (include with submissions where applicable):
+
+> I acknowledge that I am responsible for the content of this submission. I used
+> AI tools [describe briefly: e.g., "to debug code," "to brainstorm ideas," or
+> "not at all"], and I have critically reviewed and verified all outputs to
+> reflect my own understanding.
+
+---
+
+## Software
+
+All coursework uses Python. You will need:
+
+- Python 3.11 or newer
+- PyTorch, NumPy, Matplotlib, scikit-learn
+- Jupyter (locally, or Google Colab in the browser)
+
+Setup instructions are in the
+[repository README](https://github.com/harunpirim/IMSE774-NeuralNetworks).
+Google Colab is acceptable for every assignment and requires no local
+installation.
+
+---
+
+::: {.callout-note appearance="simple"}
+This syllabus is a guide to the course and may be adjusted as the semester
+progresses. Any changes will be announced in class and posted on the course
+website and Blackboard.
+:::

@@ -1,0 +1,108 @@
+---
+title: "Variational Autoencoders and GANs"
+subtitle: "Week 14 · November 24, 2026"
+description: "Latent variable models, the evidence lower bound, adversarial training, and mode collapse."
+categories: [generative]
+---
+
+::: {.lecture-meta}
+**Reading** Prince, *Understanding Deep Learning*, Chapters 15 and 17 &nbsp;·&nbsp;
+**Assignment** A12, due Sunday, November 29
+:::
+
+::: {.callout-warning appearance="simple"}
+These notes are still being written. The reading above is authoritative until
+this banner disappears.
+:::
+
+## Learning Objectives
+
+By the end of this week you should be able to:
+
+1. Explain what a latent variable model is and why the likelihood is intractable.
+2. Derive the evidence lower bound and interpret its two terms.
+3. Describe the reparameterization trick and why it is necessary.
+4. Describe the GAN minimax objective and the roles of generator and discriminator.
+5. Explain mode collapse and training instability in GANs.
+6. Compare VAEs and GANs on sample quality, diversity, and training stability.
+
+```{python}
+#| label: setup
+#| code-fold: true
+#| code-summary: "Plotting setup (click to expand)"
+
+import numpy as np
+import matplotlib.pyplot as plt
+import torch
+
+torch.manual_seed(774)
+np.random.seed(774)
+
+plt.rcParams.update({
+    "figure.figsize": (7, 4),
+    "figure.dpi": 130,
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+    "axes.grid": True,
+    "grid.alpha": 0.25,
+    "font.size": 10,
+    "legend.frameon": False,
+})
+
+NDSU_GREEN = "#005643"
+NDSU_GOLD  = "#FFC72C"
+ACCENT     = "#C1121F"
+```
+
+---
+
+## Latent Variable Models
+
+TODO
+
+## The Evidence Lower Bound
+
+TODO
+
+## The Reparameterization Trick
+
+TODO
+
+## Training and Sampling from a VAE
+
+TODO
+
+## Generative Adversarial Networks
+
+TODO
+
+## Mode Collapse and Training Instability
+
+TODO
+
+## Comparing VAEs and GANs
+
+TODO
+
+## Summary
+
+TODO
+
+---
+
+## Exercises
+
+Problem numbers refer to Prince, Chapters 15 and 17.
+
+**1.** TODO
+
+**2.** TODO
+
+**3. Computational.** TODO
+
+---
+
+## Further Reading
+
+- Prince, *Understanding Deep Learning*, Chapters 15 and 17.
+- TODO
