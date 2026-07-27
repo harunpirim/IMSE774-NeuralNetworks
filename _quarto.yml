@@ -26,22 +26,20 @@ website:
       - text: Schedule
         href: schedule.qmd
       - text: Lecture Notes
-        href: notes/03-shallow-networks.qmd
+        href: notes/01-introduction.qmd
     right:
       - icon: github
         href: https://github.com/harunpirim/IMSE774-NeuralNetworks
         aria-label: GitHub
+  # The sidebar must not repeat any navbar href. Quarto marks a navbar item
+  # active when its href also appears in the sidebar, and breaks on the first
+  # match -- so duplicating Home here would keep Home highlighted site-wide.
   sidebar:
+    title: "Lecture Notes"
     style: docked
     search: true
     collapse-level: 2
     contents:
-      - text: Home
-        href: index.qmd
-      - text: Syllabus
-        href: syllabus.qmd
-      - text: Schedule
-        href: schedule.qmd
       - section: "Foundations"
         contents:
           - notes/01-introduction.qmd
