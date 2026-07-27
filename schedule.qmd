@@ -77,7 +77,7 @@ failure modes, and code.
 
 ::: {.callout-important}
 ## Midterm Exam — Thursday, October 22
-In class, computer-based, covering Chapters 1–9. Bring a laptop.
+In class, multiple-choice, closed book, covering Chapters 1–9.
 :::
 
 ### Part III — Architectures

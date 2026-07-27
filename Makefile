@@ -3,7 +3,7 @@
 QUARTO ?= quarto
 
 help:
-	@echo "IME 774 course site"
+	@echo "IMSE 774 course site"
 	@echo ""
 	@echo "  make site       Render the website to _site/"
 	@echo "  make preview    Live-reloading preview in the browser"

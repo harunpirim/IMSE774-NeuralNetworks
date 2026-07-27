@@ -1,5 +1,5 @@
 ---
-title: "IME 774 — Neural Networks"
+title: "IMSE 774 — Neural Networks"
 subtitle: "Fall 2026 Syllabus · 3 credits"
 author: "Harun Pirim, PhD"
 date: "2026-08-25"
@@ -17,7 +17,7 @@ format:
 
 | | |
 |:---------------------|:-------------------------------------------------|
-| **Course** | IME 774 — Neural Networks (3 credits) |
+| **Course** | IMSE 774 — Neural Networks (3 credits) |
 | **Term** | Fall 2026 |
 | **Meeting time** | Tuesday & Thursday, 12:30–1:45 p.m. |
 | **Room** | TBA |
@@ -106,9 +106,9 @@ Sunday following the week they are posted.
 
 ### Midterm Exam (20%)
 
-A computer-based, in-class exam on **Thursday, October 22, 2026**, covering all
-topics through Chapter 9 (regularization). Bring a laptop; let the instructor
-know in advance if you do not have one available.
+An in-class, closed-book multiple-choice exam on **Thursday, October 22, 2026**,
+covering all topics through Chapter 9 (regularization). No laptop or computer is
+required.
 
 ### Paper Presentation (20%)
 

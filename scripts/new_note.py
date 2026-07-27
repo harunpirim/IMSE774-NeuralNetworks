@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate skeleton lecture-note files for IME 774.
+"""Generate skeleton lecture-note files for IMSE 774.
 
 Each note gets a consistent structure: metadata banner, learning objectives,
 content sections, summary, and exercises. Existing files are never overwritten,

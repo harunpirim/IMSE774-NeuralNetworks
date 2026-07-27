@@ -1,6 +1,6 @@
-# IME 774 — Neural Networks
+# IMSE 774 — Neural Networks
 
-Course materials for **IME 774: Neural Networks** at North Dakota State
+Course materials for **IMSE 774: Neural Networks** at North Dakota State
 University, Fall 2026. Cross-listed as PSYC 735 and CSCI 735.
 
 **Course website:** <https://harunpirim.github.io/IMSE774-NeuralNetworks/>

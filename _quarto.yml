@@ -8,7 +8,7 @@ project:
     - notes/*.qmd
 
 website:
-  title: "IME 774 · Neural Networks"
+  title: "IMSE 774 · Neural Networks"
   description: "Graduate course in neural networks and deep learning, North Dakota State University."
   site-url: https://harunpirim.github.io/IMSE774-NeuralNetworks/
   repo-url: https://github.com/harunpirim/IMSE774-NeuralNetworks
@@ -66,7 +66,7 @@ website:
           - notes/14-vaes-and-gans.qmd
           - notes/15-diffusion-models.qmd
   page-footer:
-    left: "IME 774 · Fall 2026 · Harun Pirim, PhD"
+    left: "IMSE 774 · Fall 2026 · Harun Pirim, PhD"
     right: "Built with [Quarto](https://quarto.org)"
 
 format:

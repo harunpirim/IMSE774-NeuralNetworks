@@ -1,5 +1,5 @@
 ---
-title: "IME 774 — Neural Networks"
+title: "IMSE 774 — Neural Networks"
 subtitle: "North Dakota State University · Fall 2026"
 format:
   html:
@@ -7,7 +7,7 @@ format:
     toc: false
 ---
 
-Welcome to IME 774. This site hosts the syllabus, schedule, and lecture notes for
+Welcome to IMSE 774. This site hosts the syllabus, schedule, and lecture notes for
 the course. Everything here is generated from the
 [course repository](https://github.com/harunpirim/IMSE774-NeuralNetworks) and is
 available as both a web page and a downloadable PDF.
@@ -70,7 +70,7 @@ problem you chose yourself.
 | Component | Weight | Notes |
 |:---------------|-------:|:---------------------------------------|
 | Assignments | 30% | Roughly weekly, submitted as notebooks |
-| Midterm exam | 20% | In class, Thursday, October 22 |
+| Midterm exam | 20% | In class, multiple choice, Thursday, October 22 |
 | Presentation | 20% | Recent paper, December 3 / 8 / 10 |
 | Project | 30% | Final report due Monday, December 14 |
 
