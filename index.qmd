@@ -17,8 +17,8 @@ available as both a web page and a downloadable PDF.
 ::: {.g-col-12 .g-col-md-4}
 ### Meeting
 
-Tuesday & Thursday
-12:30–1:45 p.m.
+Tuesday & Thursday\
+12:30–1:45 p.m.\
 Room TBA
 
 August 25 – December 10, 2026
@@ -27,17 +27,17 @@ August 25 – December 10, 2026
 ::: {.g-col-12 .g-col-md-4}
 ### Instructor
 
-**Harun Pirim, PhD**
-Offerdahl 106
-[harun.pirim@ndsu.edu](mailto:harun.pirim@ndsu.edu)
+**Harun Pirim, PhD**\
+Offerdahl 106\
+[harun.pirim@ndsu.edu](mailto:harun.pirim@ndsu.edu)\
 (701) 231-7285
 :::
 
 ::: {.g-col-12 .g-col-md-4}
 ### Textbook
 
-Simon J. D. Prince,
-*Understanding Deep Learning*,
+Simon J. D. Prince,\
+*Understanding Deep Learning*,\
 MIT Press, 2024.
 
 [Free from the author](https://udlbook.github.io/udlbook/)
