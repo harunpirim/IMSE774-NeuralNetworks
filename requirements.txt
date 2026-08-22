@@ -19,3 +19,7 @@ jupyter>=1.0
 ipykernel>=6.29
 nbformat>=5.9
 nbclient>=0.9
+
+# Authoring only: resolves printed page numbers in the textbook PDF for the
+# citations in each note (.cursor/skills/lecture-note/scripts/udl_locate.py)
+pypdf>=4.0
