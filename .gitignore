@@ -10,6 +10,9 @@ Icon?
 /_site/
 /.quarto/
 /_freeze/
+# Stylus-markup PDFs (make annotate); regenerated on demand, reachable on the
+# iPad through iCloud Drive without being committed.
+/_annotate/
 *_files/
 *.tex
 !assets/tex/*.tex

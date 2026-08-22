@@ -62,6 +62,7 @@ Then:
 make site      # render the website to _site/
 make preview   # live-reloading preview in your browser
 make pdf       # render every page to PDF in _site/pdf/
+make annotate  # wide-margin PDFs for stylus markup, into _annotate/
 make all       # website + PDFs
 make clean     # remove build artifacts
 ```
@@ -72,6 +73,26 @@ Quarto's own:
 ```bash
 quarto install tinytex
 ```
+
+### Annotating notes on a tablet
+
+`make annotate` renders the notes with the text column narrowed to 5.15in and
+the remaining 2.6in of the page left as a dot-ruled band, which is room enough
+to write beside any paragraph. Restrict it to one note with `make annotate
+NOTE=03`.
+
+Output goes to `_annotate/`, which is gitignored but still inside iCloud Drive,
+so the PDFs turn up on an iPad under **Files > iCloud Drive** with nothing to
+upload. Open one in GoodNotes, Notability, PDF Expert, or Books and mark it up
+with the Apple Pencil. Ink lives in the annotation app, not in the repository,
+so re-running `make annotate` never overwrites handwriting held elsewhere —
+but it does replace the file in `_annotate/`, so keep marked-up copies in the
+annotation app rather than in that folder.
+
+Adjust the ruling in `assets/tex/annotate-preamble.tex` and the page geometry in
+`_quarto-annotate.yml`; the two have to agree about where the text column ends.
+The dot grid needs `tikz`, and silently falls back to a plain empty margin if
+the LaTeX installation lacks it.
 
 ### Rendering a single note
 

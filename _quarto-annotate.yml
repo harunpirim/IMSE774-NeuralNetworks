@@ -1,0 +1,45 @@
+# Quarto profile: stylus-annotatable lecture notes.
+#
+#     make annotate            every note
+#     make annotate NOTE=03    just notes/03-*.qmd
+#
+# Merged over _quarto.yml by `quarto render --profile annotate`. Output lands in
+# _annotate/, which is gitignored but still inside iCloud Drive, so the PDFs
+# appear on the iPad in Files > iCloud Drive without any upload step. Open one
+# in GoodNotes, Notability, or Books and write on it with the Apple Pencil.
+#
+# The layout keeps a normal 5.15in reading measure and gives the whole outer
+# 2.6in to handwriting. Changing `right` here means changing the dot band in
+# assets/tex/annotate-preamble.tex to match.
+
+project:
+  output-dir: _annotate
+  render:
+    - notes/*.qmd
+
+format:
+  pdf:
+    documentclass: scrartcl
+    papersize: letter
+    shift-heading-level-by: -1
+    geometry:
+      - paperwidth=8.5in
+      - paperheight=11in
+      - left=0.75in
+      - right=2.6in
+      - top=0.8in
+      - bottom=0.8in
+    fontsize: 11pt
+    linestretch: 1.25
+    colorlinks: true
+    linkcolor: RoyalBlue
+    urlcolor: RoyalBlue
+    citecolor: RoyalBlue
+    number-sections: true
+    toc: true
+    toc-depth: 2
+    fig-pos: "H"
+    include-in-header:
+      - assets/tex/preamble.tex
+      - assets/tex/annotate-preamble.tex
+    keep-tex: false

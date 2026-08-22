@@ -1,0 +1,33 @@
+% Loaded only by the `annotate` profile (make annotate), on top of preamble.tex.
+% Draws a faint dot grid in the wide outer margin so the PDF can be marked up
+% with a stylus and the handwriting stays on a baseline.
+%
+% Deliberately avoids eso-pic/background, which are absent from a stock TinyTeX
+% and whose download hangs the render. The LaTeX kernel's shipout/background
+% hook does the same job with no package beyond tikz, which TinyTeX does ship.
+% If tikz is ever missing too, degrade to a plain empty margin rather than fail.
+
+% Tune the ruling here. Lighter than gray 0.70 disappears on an iPad screen;
+% much darker than 0.60 competes with the handwriting.
+\providecommand{\annotdotsize}{0.55pt}
+\definecolor{annotgrid}{gray}{0.66}
+
+\IfFileExists{tikz.sty}{%
+  \usepackage{tikz}%
+  % Inside shipout/background the picture origin is the top-left corner of the
+  % paper, so y runs negative downwards. The band must agree with the `right`
+  % margin in _quarto-annotate.yml: the text column ends at 8.5in - 2.6in, so
+  % the dots start just past 5.9in and stop short of the trim edge. 0.25in
+  % spacing is a comfortable hand-writing ruling.
+  \AddToHook{shipout/background}{%
+    \put(0,0){%
+      \begin{tikzpicture}[overlay]
+        \foreach \gx in {6.10,6.35,...,8.20}{%
+          \foreach \gy in {-0.80,-1.05,...,-10.15}{%
+            \fill[annotgrid] (\gx in,\gy in) circle (\annotdotsize);%
+          }%
+        }%
+      \end{tikzpicture}%
+    }%
+  }%
+}{}

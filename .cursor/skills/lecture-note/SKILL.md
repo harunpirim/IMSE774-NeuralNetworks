@@ -1,6 +1,6 @@
 ---
 name: lecture-note
-description: Turns exported textbook highlights and figure screenshots into a publish-ready Quarto lecture note for the IMSE 774 neural networks course site, with paraphrased prose, verified printed-page citations, generated code figures, and an optional render-and-push. Use when the user supplies Understanding Deep Learning highlights or a Notebook Export, attaches textbook figure images, asks to write or fill in a note under notes/, or asks to update the course website.
+description: Turns exported textbook highlights and figure screenshots into a publish-ready Quarto lecture note for the IMSE 774 neural networks course site, with paraphrased prose, verified printed-page citations, generated code figures, an optional render-and-push, and a wide-margin PDF for stylus markup on an iPad. Use when the user supplies Understanding Deep Learning highlights or a Notebook Export, attaches textbook figure images, asks to write or fill in a note under notes/, or asks to update the course website.
 ---
 
 # Lecture Note
@@ -32,6 +32,7 @@ The user supplies some or all of:
 - [ ] 4  Write the note
 - [ ] 5  Render and verify
 - [ ] 6  Commit, push, confirm CI
+- [ ] 7  Build the stylus-markup copy for the iPad
 ```
 
 ### 1. Read the highlights
@@ -125,6 +126,22 @@ gh run watch <run-id> --exit-status --interval 20
 
 CI re-executes every code cell from a clean checkout because `_freeze/` is
 gitignored, so a cell that only works locally will fail there.
+
+### 7. Build the stylus-markup copy
+
+```bash
+make annotate NOTE=NN
+```
+
+Writes `_annotate/notes/NN-slug.pdf` — the same note with the text column
+narrowed to 5.15in and the remaining 2.6in left as a dot-ruled band to write in.
+`_annotate/` is gitignored but sits inside iCloud Drive, so the file reaches the
+iPad under Files > iCloud Drive with no upload step, ready to mark up in
+GoodNotes or Notability.
+
+Do this last, after the push, so the annotated copy matches what is live. Run it
+outside the sandbox for the same torch reason as step 5. Mention the path in the
+summary so the user knows it is waiting.
 
 ## Rewriting highlights
 
