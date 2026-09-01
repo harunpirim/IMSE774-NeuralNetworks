@@ -51,7 +51,7 @@ MIT Press, 2024.
 
 - **[Syllabus](syllabus.qmd)** — grading, policies, and key dates
 - **[Schedule](schedule.qmd)** — week-by-week topics and readings
-- **[Lecture notes](notes/03-shallow-networks.qmd)** — one page per topic, with runnable code
+- **[Lecture notes](notes/01-introduction.qmd)** — one page per topic, with runnable code and a Colab notebook
 - **[Course flyer](flyer/flyer.pdf)** — one page to print, post, or forward to a colleague
 
 ## What This Course Covers
@@ -82,7 +82,8 @@ problem you chose yourself.
 All coursework uses Python with PyTorch. You have two options.
 
 **Google Colab** — nothing to install, works in the browser, free GPUs. This is
-fine for every assignment in the course.
+fine for every assignment in the course. Each lecture note carries an *Open in
+Colab* link to a notebook holding all of that week's code.
 
 **Local install** — clone the repository and create an environment:
 

@@ -1,4 +1,4 @@
-.PHONY: help site preview pdf annotate all clean deep-clean notes check flyer
+.PHONY: help site preview pdf annotate all clean deep-clean notes notebooks check flyer
 
 QUARTO ?= quarto
 
@@ -11,6 +11,7 @@ help:
 	@echo "  make annotate   Stylus-markup PDFs of the notes into _annotate/"
 	@echo "  make all        Website plus PDFs"
 	@echo "  make notes      Scaffold any lecture notes that don't exist yet"
+	@echo "  make notebooks  Export each note's code cells to notebooks/ for Colab"
 	@echo "  make check      List which notes exist"
 	@echo "  make flyer      Rebuild the one-page recruiting flyer"
 	@echo "  make clean      Remove rendered output"
@@ -55,6 +56,12 @@ flyer:
 
 notes:
 	python scripts/new_note.py
+
+# The "Open in Colab" link at the top of each note points at the notebook this
+# target writes, so re-run it whenever a note's code changes and commit the
+# result -- Colab reads the .ipynb straight out of the GitHub repository.
+notebooks:
+	python scripts/qmd_to_notebook.py
 
 check:
 	python scripts/new_note.py --list

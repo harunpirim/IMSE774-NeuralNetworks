@@ -31,11 +31,13 @@ silently drift out of sync with the code that generated it.
 │   ├── 01-introduction.qmd
 │   ├── ...
 │   └── 15-diffusion-models.qmd
+├── notebooks/              # Colab copies of each note's code, generated
 ├── assets/
 │   ├── css/                # Site theme (SCSS + CSS)
 │   └── tex/preamble.tex    # LaTeX preamble for PDF output
 ├── scripts/
-│   └── new_note.py         # Generates skeleton note files
+│   ├── new_note.py         # Generates skeleton note files
+│   └── qmd_to_notebook.py  # Exports a note's code cells to notebooks/
 ├── .github/workflows/      # Build and deploy to GitHub Pages
 ├── _quarto.yml             # Project configuration
 ├── references.bib          # Bibliography
@@ -63,6 +65,7 @@ make site      # render the website to _site/
 make preview   # live-reloading preview in your browser
 make pdf       # render every page to PDF in _site/pdf/
 make annotate  # wide-margin PDFs for stylus markup, into _annotate/
+make notebooks # export each note's code cells to notebooks/ for Colab
 make all       # website + PDFs
 make clean     # remove build artifacts
 ```
@@ -113,6 +116,15 @@ python scripts/new_note.py --list   # show which notes exist
 ```
 
 Existing files are never overwritten, so this is safe to re-run at any time.
+
+Each note links to a Colab notebook holding the same code, so students can run
+it without installing anything. Regenerate the notebooks after editing a note's
+code and commit the result — Colab loads the `.ipynb` straight from GitHub:
+
+```bash
+make notebooks                                   # every note
+python scripts/qmd_to_notebook.py notes/02-*.qmd  # just one
+```
 
 A few conventions worth keeping:
 
