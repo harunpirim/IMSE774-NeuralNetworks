@@ -3,6 +3,18 @@ title: "Mathematical and Computational Background"
 subtitle: "Week 2 · Sessions 3–4 · September 1 & 3, 2026"
 description: "The linear algebra and matrix calculus of Appendix B, written as runnable Python, and supervised learning revisited as a family of functions with a loss."
 categories: [foundations]
+
+# The code that produces the figures and results below is not printed on the
+# page -- it made for a wall of Python between the paragraphs. It lives in the
+# Colab notebook linked at the top of the note, generated from this file by
+# scripts/qmd_to_notebook.py, and it still runs here so the figures and the
+# printed results stay in step with the prose.
+execute:
+  echo: false
+
+format:
+  html:
+    code-tools: false
 ---
 
 ::: {.lecture-meta}
@@ -16,8 +28,8 @@ categories: [foundations]
 Every section opens with the section it covers in Prince, *Understanding Deep
 Learning* (MIT Press, 2024). Chapter references carry printed page numbers;
 Appendix B is cited by section number. Figures taken from the textbook are
-captioned with their original figure number; figures produced by the code on
-this page are ours. A complete cross-reference table appears in
+captioned with their original figure number; figures generated for this note
+are ours. A complete cross-reference table appears in
 @sec-reference-map.
 :::
 
@@ -35,9 +47,10 @@ By the end of this week you should be able to:
 8. Explain, using the eigenspectrum of the loss surface, why rescaling an input changes how fast gradient descent converges.
 
 ::: {.callout-tip}
-## Run the code
-Every cell on this page also lives in a notebook you can open in the browser
-with nothing to install:
+## The code lives in a notebook
+This page shows the figures and results; the Python behind them is not printed
+here. All of it — every cell, in the order the note uses it — is in a notebook
+you can open in the browser with nothing to install:
 
 - **[▶ Open the Week 2 notebook in Google Colab](https://colab.research.google.com/github/harunpirim/IMSE774-NeuralNetworks/blob/main/notebooks/week02-math-background.ipynb)** — all of this page's code, in order.
 - **[▶ UDL notebook 1.1 — Background mathematics](https://colab.research.google.com/github/udlbook/udlbook/blob/main/Notebooks/Chap01/1_1_BackgroundMathematics.ipynb)** — Prince's own exercises on linear functions, derivatives, and sums.
@@ -94,7 +107,7 @@ comfortable, the rest of the semester is about *which* $\boldsymbol{\Phi}$ and
 *how* to find it. If they are not, every chapter will feel like notation.
 
 So this note takes Appendix B one section at a time and writes each definition
-as code. Then it returns to Chapter 2 and does supervised learning again, this
+as code you can run. Then it returns to Chapter 2 and does supervised learning again, this
 time with the matrix machinery in hand.
 
 ---
@@ -169,7 +182,8 @@ $$
 (\mathbf{A}\mathbf{B})^T = \mathbf{B}^T \mathbf{A}^T.
 $$ {#eq-transpose-product}
 
-The transpose of a column vector is a row vector and vice versa.
+The transpose of a column vector is a row vector and vice versa. Checking
+@eq-transpose-product on a random product:
 
 ```{python}
 #| label: transpose
@@ -207,6 +221,8 @@ $$
 $$ {#eq-frobenius}
 
 which is just the Euclidean norm of the matrix flattened into one long vector.
+The three vector norms of $\mathbf{z} = [3, -4, 12]^T$, and the two readings of
+the Frobenius norm:
 
 ```{python}
 #| label: norms
@@ -283,7 +299,9 @@ $$ {#eq-dot-angle}
 
 @eq-dot-angle is worth committing to memory. It is why a dot product is the
 natural way to ask "how aligned are these two things?", and it is the operation
-at the heart of the attention mechanism in Chapter 12.
+at the heart of the attention mechanism in Chapter 12. Written out as a loop,
+@eq-matmul reproduces what the `@` operator does, and @eq-dot-angle recovers the
+angle between two vectors:
 
 ```{python}
 #| label: products
@@ -297,7 +315,8 @@ for i in range(3):
     for j in range(2):
         C_loop[i, j] = sum(A[i, d] * B[d, j] for d in range(4))
 
-print("loop matches @ operator:", np.allclose(C_loop, A @ B))
+print("(B.10) as an explicit loop matches the @ operator:",
+      np.allclose(C_loop, A @ B))
 
 a = np.array([2.0, 1.0, 0.0])
 b = np.array([1.0, 3.0, 1.0])
@@ -368,8 +387,8 @@ the correct condition: $\mathbf{A}\mathbf{x}$ reaches only the span of the
 columns, so it fails to fill $\mathbb{R}^{D_1}$ when the column space has
 dimension less than $D_1$, which for a full-rank matrix means $D_2 < D_1$: a
 tall, "portrait" matrix. A wide matrix ($D_2 > D_1$) covers the output space but
-pays for it with a nullspace of dimension at least $D_2 - D_1$. The code below
-checks both cases.
+pays for it with a nullspace of dimension at least $D_2 - D_1$. The output
+below checks both cases.
 :::
 
 ```{python}
@@ -513,6 +532,8 @@ $$
 \begin{bmatrix} b \\ c \\ a \end{bmatrix}.
 $$ {#eq-permutation}
 
+Each shortcut in the table, checked in turn:
+
 ```{python}
 #| label: special-matrices
 
@@ -592,7 +613,7 @@ $$ {#eq-linear-matrix}
 ::: {.callout-note appearance="simple"}
 The printed equation (B.18) opens its third row with $\phi_{20}$ where the
 matrix form (B.19) has $\phi_{30}$. @eq-linear-system above is written with
-$\phi_{30}$, which is what the rest of the appendix — and the code below —
+$\phi_{30}$, which is what the rest of the appendix — and the notebook —
 assume.
 :::
 
@@ -687,6 +708,9 @@ other. When a gradient in your code has the wrong shape, layout is the first
 thing to suspect.
 :::
 
+The Jacobian of $\mathbf{y} = \mathbf{A}\mathbf{x}$, and the derivative of a
+scalar function of a vector:
+
 ```{python}
 #| label: jacobians
 
@@ -709,8 +733,8 @@ print("\nd/dx of ||x||^2 :", x.grad.numpy(), " expected 2x :", (2 * x).detach().
 Automatic differentiation is what makes deep learning practical: we write the
 forward computation, and the library assembles the derivative by applying the
 chain rule to the operations we used. Chapter 7 opens up the machinery. For now
-it is enough to trust it — and to verify it, which is what the next cell does on
-the object we actually care about, the gradient of a loss.
+it is enough to trust it — and to verify it, which is what the two lines below
+do, on the object we actually care about: the gradient of a loss.
 
 ```{python}
 #| label: autograd-vs-analytic
@@ -1170,8 +1194,8 @@ neural network — @eq-linear-matrix, followed by a ReLU, followed by
 Appendix B has no problem set of its own. Problems 1–7 below are ours; problems
 8–10 are Prince's problems 2.1–2.3 (p. 24). Starred UDL problems have published
 answers on the [UDL website](https://udlbook.github.io/udlbook/). The
-computational problems extend code that is already on this page — start from the
-[Colab notebook](https://colab.research.google.com/github/harunpirim/IMSE774-NeuralNetworks/blob/main/notebooks/week02-math-background.ipynb).
+computational problems extend code that is already written for you — start from
+the [Colab notebook](https://colab.research.google.com/github/harunpirim/IMSE774-NeuralNetworks/blob/main/notebooks/week02-math-background.ipynb).
 :::
 
 **1.** A quality inspection station records 8 sensor readings for each of 500
@@ -1202,7 +1226,8 @@ concrete consequence for a sensor-fusion model that compresses 5 measurements to
 its eigenvalues. Is the transformation better described as a shrink, a stretch,
 or a shear? What happens to the unit circle under it?
 
-**6. Computational.** Modify the `unit_ball` function in @fig-norm-balls to plot
+**6. Computational.** In the notebook, modify the `unit_ball` function behind
+@fig-norm-balls to plot
 $p = 0.5$ alongside $p = 1$ and $p = 2$. The result is not convex. Read §B.3.2
 again and explain which property in @eq-lp-norm fails, and why that matters if
 you wanted to use $\lVert\cdot\rVert_{0.5}$ as a regularizer.
@@ -1283,7 +1308,7 @@ Figure B.3 and figures 2.1–2.4 are reproduced unaltered from Prince,
 *Understanding Deep Learning* (MIT Press, 2024), which is distributed under a
 Creative Commons CC-BY-NC-ND license, and are used here for non-commercial
 classroom instruction. All other figures on this page are generated by the code
-shown.
+in this week's notebook.
 :::
 
 ---
