@@ -751,26 +751,6 @@ print("analytic :", analytic.numpy().round(4))
 print("agree    :", torch.allclose(phi.grad, analytic, atol=1e-5))
 ```
 
-### Probability, briefly
-
-*Prince, Appendix C; used from Chapter 5 onward.*
-
-Probability lives in Appendix C rather than Appendix B, and we will need it
-properly in Week 5, where loss functions turn out to be maximum likelihood in
-disguise. Four things carry us until then: a **joint** distribution
-$\Pr(x, y)$, the **marginal** obtained by summing or integrating one variable
-away, the **conditional** $\Pr(y \mid x) = \Pr(x, y) / \Pr(x)$, and the
-**expectation** $\mathbb{E}[f[x]] = \int f[x]\Pr(x)\,dx$, which in code is
-usually just an average over samples.
-
-```{python}
-#| label: expectation
-
-samples = np.random.normal(loc=2.0, scale=1.5, size=100_000)
-print(f"E[x]   sampled {samples.mean():.4f}   exact 2.0000")
-print(f"E[x^2] sampled {(samples ** 2).mean():.4f}   exact {2.0**2 + 1.5**2:.4f}")
-```
-
 ---
 
 ## Supervised Learning, Revisited
@@ -962,7 +942,7 @@ for name, p in [("closed form", phi_closed),
 The closed form and PyTorch land on the same line. Plain gradient descent, given
 a learning rate that looks perfectly reasonable, does not: after twenty thousand
 steps its slope is still nearly 30% too large, its intercept is nowhere near the
-right value, and its loss sits about a third above the minimum. That failure is
+right value, and its loss is close to double the minimum. That failure is
 not a bug and it is not cured by being patient. It is the most useful thing on
 this page, so the next section takes it apart.
 
@@ -1083,7 +1063,7 @@ the training points.
 
 ```{python}
 #| label: fig-under-overfit
-#| fig-cap: "Underfitting, fitting, and overfitting on the same 24 training panels (filled) and 200 fresh test panels (open). The constant model cannot represent the trend it is being asked to learn. The line recovers it. The degree-12 polynomial threads the training points more closely than the line does -- its training loss is the lowest of the three -- and is useless everywhere else. Mean squared losses are printed above each panel."
+#| fig-cap: "Underfitting, fitting, and overfitting on the same 24 training panels (filled) and 200 fresh test panels (open). The constant model cannot represent the trend it is being asked to learn. The line recovers it. The degree-12 polynomial threads the training points more closely than the line does -- its training loss is the lowest of the three -- and is punished for it on parts it has never seen, at roughly twice the line's test loss. Mean squared losses are printed above each panel."
 
 # A fresh batch of parts off the same process, as an honest test set.
 temp_test = np.random.uniform(140, 200, 200)
@@ -1121,9 +1101,9 @@ plt.show()
 The ordering of those six numbers is the whole of Chapter 8 in miniature.
 Training loss falls monotonically as the model gets more expressive, so it cannot
 be used to choose a model. Test loss falls and then rises, and the model we want
-is at the bottom of that curve. Notice also how violently the degree-12 test loss
-blows up: most of the damage happens near the edges of the temperature range,
-where a high-degree polynomial has nothing holding it down. Chapter 9 answers
+is at the bottom of that curve. Notice where the degree-12 model does its damage:
+the curve swings hardest near the ends of the temperature range, where a
+high-degree polynomial has the fewest points holding it down. Chapter 9 answers
 this with regularization; for now the practical rule is that a model must be
 scored on data it has never seen. We were able to make more parts here; when you
 cannot, you hold part of the dataset back instead, which is what Chapter 8 is
@@ -1278,7 +1258,6 @@ book; Appendix B is cited by section.
 | Special Types of Matrix | §B.4.1–§B.4.4 | App. B | — |
 | Linear Equations in Matrix Form | §B.4.5, §B.4.6 | App. B | — |
 | Matrix Calculus | §B.5 | App. B | — |
-| — Probability, briefly | App. C (preview) | App. C | — |
 | Supervised Learning, Revisited | §2.1 | 17–18 | — |
 | Linear Regression, in Matrix Form | §2.2 | 18–22 | — |
 | — The model | §2.2.1 | 18 | 2.1 (p. 19) |
