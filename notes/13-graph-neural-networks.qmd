@@ -6,8 +6,7 @@ categories: [architectures]
 ---
 
 ::: {.lecture-meta}
-**Reading** Prince, *Understanding Deep Learning*, Chapter 13 &nbsp;·&nbsp;
-**Assignment** A11, due Sunday, November 22
+**Reading** Prince, *Understanding Deep Learning*, Chapter 13
 :::
 
 ::: {.callout-warning appearance="simple"}

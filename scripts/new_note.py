@@ -16,13 +16,13 @@ from pathlib import Path
 
 NOTES_DIR = Path(__file__).resolve().parent.parent / "notes"
 
-# slug, title, week, sessions, dates, reading, assignment, subtitle blurb, sections
+# slug, title, week, sessions, dates, reading, deadline, subtitle blurb, sections
 NOTES: list[dict] = [
     dict(
         slug="01-introduction",
         title="Introduction and Supervised Learning",
         week=1, dates="August 25 & 27, 2026", reading="Chapters 1–2",
-        assignment=None,
+        deadline=None,
         description="What deep learning is, the three learning paradigms, and the supervised learning recipe.",
         category="foundations",
         objectives=[
@@ -46,7 +46,7 @@ NOTES: list[dict] = [
         slug="02-math-background",
         title="Mathematical and Computational Background",
         week=2, dates="September 1 & 3, 2026", reading="Appendix B; UDL notebooks 1.1–2.1",
-        assignment="A1, due Sunday, September 6",
+        deadline=None,
         description="The linear algebra, calculus, probability, and PyTorch you need for the rest of the course.",
         category="foundations",
         objectives=[
@@ -69,7 +69,7 @@ NOTES: list[dict] = [
         slug="04-deep-networks",
         title="Deep Neural Networks",
         week=4, dates="September 15 & 17, 2026", reading="Chapter 4",
-        assignment="A3, due Sunday, September 20",
+        deadline=None,
         description="Composing hidden layers, matrix notation for depth, and why depth beats width.",
         category="foundations",
         objectives=[
@@ -92,7 +92,7 @@ NOTES: list[dict] = [
         slug="05-loss-functions",
         title="Loss Functions",
         week=5, dates="September 22 & 24, 2026", reading="Chapter 5",
-        assignment="A4, due Sunday, September 27",
+        deadline=None,
         description="Deriving losses from maximum likelihood for regression, binary, and multiclass problems.",
         category="training",
         objectives=[
@@ -116,7 +116,7 @@ NOTES: list[dict] = [
         slug="06-fitting-models",
         title="Fitting Models",
         week=6, dates="September 29 & October 1, 2026", reading="Chapter 6",
-        assignment="A5, due Sunday, October 4",
+        deadline=None,
         description="Gradient descent, stochastic gradient descent, momentum, and Adam.",
         category="training",
         objectives=[
@@ -140,7 +140,7 @@ NOTES: list[dict] = [
         slug="07-gradients-initialization",
         title="Gradients and Initialization",
         week=7, dates="October 6 & 8, 2026", reading="Chapter 7",
-        assignment="A6, due Sunday, October 11; project proposal due October 8",
+        deadline=("Due", "Project proposal, Thursday, October 8"),
         description="Backpropagation derived from scratch, plus why initialization determines whether training works.",
         category="training",
         objectives=[
@@ -163,7 +163,7 @@ NOTES: list[dict] = [
         slug="08-measuring-performance",
         title="Measuring Performance",
         week=8, dates="October 13 & 15, 2026", reading="Chapter 8",
-        assignment="A7, due Sunday, October 18",
+        deadline=None,
         description="Training, validation, and test error; the bias-variance trade-off; double descent.",
         category="training",
         objectives=[
@@ -186,7 +186,7 @@ NOTES: list[dict] = [
         slug="09-regularization",
         title="Regularization",
         week=9, dates="October 20, 2026", reading="Chapter 9",
-        assignment="Midterm exam Thursday, October 22",
+        deadline=("Exam", "Midterm, in class Thursday, October 22"),
         description="Explicit and implicit regularization: weight decay, dropout, early stopping, augmentation.",
         category="training",
         objectives=[
@@ -210,7 +210,7 @@ NOTES: list[dict] = [
         slug="10-convolutional-networks",
         title="Convolutional Networks",
         week=10, dates="October 27 & 29, 2026", reading="Chapters 10–11",
-        assignment="A8, due Sunday, November 1",
+        deadline=None,
         description="Convolution, pooling, residual connections, batch normalization, and modern image models.",
         category="architectures",
         objectives=[
@@ -236,7 +236,7 @@ NOTES: list[dict] = [
         slug="11-transformers",
         title="Transformers",
         week=11, dates="November 3 & 5, 2026", reading="Chapter 12",
-        assignment="A9, due Sunday, November 8; paper choice due November 5",
+        deadline=("Due", "Presentation paper selection, Thursday, November 5"),
         description="Self-attention, multi-head attention, positional encoding, and the three transformer families.",
         category="architectures",
         objectives=[
@@ -262,7 +262,7 @@ NOTES: list[dict] = [
         slug="12-large-language-models",
         title="Large Language Models",
         week=12, dates="November 10 & 12, 2026", reading="Chapter 12 and supplementary notes",
-        assignment="A10, due Sunday, November 15; project progress update due November 12",
+        deadline=("Due", "Project progress update, Thursday, November 12"),
         description="Pretraining, scaling laws, tokenization, rotary embeddings, and efficient inference.",
         category="architectures",
         objectives=[
@@ -288,7 +288,7 @@ NOTES: list[dict] = [
         slug="13-graph-neural-networks",
         title="Graph Neural Networks",
         week=13, dates="November 17 & 19, 2026", reading="Chapter 13",
-        assignment="A11, due Sunday, November 22",
+        deadline=None,
         description="Representing graphs, permutation equivariance, message passing, and graph-level tasks.",
         category="architectures",
         objectives=[
@@ -313,7 +313,7 @@ NOTES: list[dict] = [
         slug="14-vaes-and-gans",
         title="Variational Autoencoders and GANs",
         week=14, dates="November 24, 2026", reading="Chapters 15 and 17",
-        assignment="A12, due Sunday, November 29",
+        deadline=None,
         description="Latent variable models, the evidence lower bound, adversarial training, and mode collapse.",
         category="generative",
         objectives=[
@@ -338,7 +338,7 @@ NOTES: list[dict] = [
         slug="15-diffusion-models",
         title="Diffusion Models",
         week=15, dates="December 1, 2026", reading="Chapter 18",
-        assignment=None,
+        deadline=None,
         description="The forward noising process, learning to denoise, sampling, and conditional generation.",
         category="generative",
         objectives=[
@@ -370,7 +370,7 @@ categories: [{category}]
 ---
 
 ::: {{.lecture-meta}}
-**Reading** Prince, *Understanding Deep Learning*, {reading}{assignment_md}
+**Reading** Prince, *Understanding Deep Learning*, {reading}{deadline_md}
 :::
 
 ::: {{.callout-warning appearance="simple"}}
@@ -441,9 +441,11 @@ Problem numbers refer to Prince, {reading}.
 
 
 def build(note: dict) -> str:
-    assignment_md = (
-        f" &nbsp;·&nbsp;\n**Assignment** {note['assignment']}"
-        if note["assignment"]
+    # Weekly assignment due dates live in Blackboard, not here. Only exam and
+    # project milestones get a line in the note's metadata banner.
+    deadline_md = (
+        " &nbsp;·&nbsp;\n**{0}** {1}".format(*note["deadline"])
+        if note["deadline"]
         else ""
     )
     objectives_md = "\n".join(
@@ -451,7 +453,7 @@ def build(note: dict) -> str:
     )
     sections_md = "\n".join(f"## {s}\n\nTODO\n" for s in note["sections"])
     return TEMPLATE.format(
-        assignment_md=assignment_md,
+        deadline_md=deadline_md,
         objectives_md=objectives_md,
         sections_md=sections_md,
         **note,

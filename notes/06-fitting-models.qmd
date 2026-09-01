@@ -6,8 +6,7 @@ categories: [training]
 ---
 
 ::: {.lecture-meta}
-**Reading** Prince, *Understanding Deep Learning*, Chapter 6 &nbsp;·&nbsp;
-**Assignment** A5, due Sunday, October 4
+**Reading** Prince, *Understanding Deep Learning*, Chapter 6
 :::
 
 ::: {.callout-warning appearance="simple"}

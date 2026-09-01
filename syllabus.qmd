@@ -100,8 +100,9 @@ By the end of this course, students will be able to:
 
 Roughly weekly assignments reinforce the concepts from lecture and apply them to
 datasets. Assignments are distributed as Jupyter notebooks and submitted through
-Blackboard. Unless stated otherwise, assignments are due at 11:59 p.m. on the
-Sunday following the week they are posted.
+Blackboard, which is also where each assignment's due date is posted. The
+[Schedule](schedule.qmd) page carries only the exam and project milestones, so
+Blackboard is the authority on assignment deadlines.
 
 ### Midterm Exam (20%)
 

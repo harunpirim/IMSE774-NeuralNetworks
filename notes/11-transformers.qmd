@@ -7,7 +7,7 @@ categories: [architectures]
 
 ::: {.lecture-meta}
 **Reading** Prince, *Understanding Deep Learning*, Chapter 12 &nbsp;·&nbsp;
-**Assignment** A9, due Sunday, November 8; paper choice due November 5
+**Due** Presentation paper selection, Thursday, November 5
 :::
 
 ::: {.callout-warning appearance="simple"}

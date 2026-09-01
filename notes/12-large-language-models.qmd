@@ -7,7 +7,7 @@ categories: [architectures]
 
 ::: {.lecture-meta}
 **Reading** Prince, *Understanding Deep Learning*, Chapter 12 and supplementary notes &nbsp;·&nbsp;
-**Assignment** A10, due Sunday, November 15; project progress update due November 12
+**Due** Project progress update, Thursday, November 12
 :::
 
 ::: {.callout-warning appearance="simple"}

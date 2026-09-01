@@ -19,8 +19,7 @@ format:
 
 ::: {.lecture-meta}
 **Reading** Prince, *Understanding Deep Learning*, Appendix B (§B.3–§B.5); Chapter 2 revisited (pp. 17–24) &nbsp;·&nbsp;
-**UDL notebooks** 1.1, 2.1 &nbsp;·&nbsp;
-**Assignment** A1, due Sunday, September 6
+**UDL notebooks** 1.1, 2.1
 :::
 
 ::: {.callout-note appearance="simple"}

@@ -7,8 +7,7 @@ categories: [foundations]
 
 ::: {.lecture-meta}
 **Reading** Prince, *Understanding Deep Learning*, Chapter 3 &nbsp;·&nbsp;
-**UDL notebooks** 3.1–3.4 &nbsp;·&nbsp;
-**Assignment** A2, due Sunday, September 13
+**UDL notebooks** 3.1–3.4
 :::
 
 ## Learning Objectives

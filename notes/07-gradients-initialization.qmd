@@ -7,7 +7,7 @@ categories: [training]
 
 ::: {.lecture-meta}
 **Reading** Prince, *Understanding Deep Learning*, Chapter 7 &nbsp;·&nbsp;
-**Assignment** A6, due Sunday, October 11; project proposal due October 8
+**Due** Project proposal, Thursday, October 8
 :::
 
 ::: {.callout-warning appearance="simple"}

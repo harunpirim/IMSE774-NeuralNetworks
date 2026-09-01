@@ -7,7 +7,7 @@ categories: [training]
 
 ::: {.lecture-meta}
 **Reading** Prince, *Understanding Deep Learning*, Chapter 9 &nbsp;·&nbsp;
-**Assignment** Midterm exam Thursday, October 22
+**Exam** Midterm, in class Thursday, October 22
 :::
 
 ::: {.callout-warning appearance="simple"}

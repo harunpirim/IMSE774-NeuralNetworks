@@ -6,8 +6,7 @@ categories: [generative]
 ---
 
 ::: {.lecture-meta}
-**Reading** Prince, *Understanding Deep Learning*, Chapters 15 and 17 &nbsp;·&nbsp;
-**Assignment** A12, due Sunday, November 29
+**Reading** Prince, *Understanding Deep Learning*, Chapters 15 and 17
 :::
 
 ::: {.callout-warning appearance="simple"}

@@ -7,8 +7,7 @@ categories: [foundations]
 
 ::: {.lecture-meta}
 **Reading** Prince, *Understanding Deep Learning*, Chapter 1 (pp. 1–16) and Chapter 2 (pp. 17–24) &nbsp;·&nbsp;
-**UDL notebook** 1.1 (Background mathematics) &nbsp;·&nbsp;
-**Assignment** none this week
+**UDL notebook** 1.1 (Background mathematics)
 :::
 
 ::: {.callout-note appearance="simple"}

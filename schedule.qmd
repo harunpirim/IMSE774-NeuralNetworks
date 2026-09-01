@@ -17,6 +17,9 @@ Learning* (MIT Press, 2024).
 Read the assigned chapter **before** the first meeting of the week. Lecture time
 is spent on the parts that are hard to get from reading alone: derivations,
 failure modes, and code.
+
+Weekly assignments are posted in Blackboard with their own due dates; the **Due**
+column below carries only the exam and project milestones.
 :::
 
 ## Weekly Plan
@@ -24,19 +27,19 @@ failure modes, and code.
 | Week | Dates | Topic | Reading | Due |
 |:--:|:--------------|:-----------------------------------|:--------|:-----------|
 | 1 | Aug 25, 27 | Introduction; supervised learning | Ch. 1–2 | — |
-| 2 | Sep 1, 3 | Mathematical & Python background | App. B | A1 |
-| 3 | Sep 8, 10 | Shallow neural networks | Ch. 3 | A2 |
-| 4 | Sep 15, 17 | Deep neural networks | Ch. 4 | A3 |
-| 5 | Sep 22, 24 | Loss functions | Ch. 5 | A4 |
-| 6 | Sep 29, Oct 1 | Fitting models | Ch. 6 | A5 |
-| 7 | Oct 6, 8 | Gradients & initialization | Ch. 7 | A6, **Proposal** |
-| 8 | Oct 13, 15 | Measuring performance | Ch. 8 | A7 |
+| 2 | Sep 1, 3 | Mathematical & Python background | App. B | — |
+| 3 | Sep 8, 10 | Shallow neural networks | Ch. 3 | — |
+| 4 | Sep 15, 17 | Deep neural networks | Ch. 4 | — |
+| 5 | Sep 22, 24 | Loss functions | Ch. 5 | — |
+| 6 | Sep 29, Oct 1 | Fitting models | Ch. 6 | — |
+| 7 | Oct 6, 8 | Gradients & initialization | Ch. 7 | **Proposal** |
+| 8 | Oct 13, 15 | Measuring performance | Ch. 8 | — |
 | 9 | Oct 20, 22 | Regularization; **midterm Oct 22** | Ch. 9 | **Midterm** |
-| 10 | Oct 27, 29 | Convolutional networks; residual networks | Ch. 10–11 | A8 |
-| 11 | Nov 3, 5 | Transformers | Ch. 12 | A9, **Paper choice** |
-| 12 | Nov 10, 12 | Large language models | Ch. 12 + notes | A10, **Progress** |
-| 13 | Nov 17, 19 | Graph neural networks | Ch. 13 | A11 |
-| 14 | Nov 24 | VAEs & GANs *(no class Nov 26)* | Ch. 15, 17 | A12 |
+| 10 | Oct 27, 29 | Convolutional networks; residual networks | Ch. 10–11 | — |
+| 11 | Nov 3, 5 | Transformers | Ch. 12 | **Paper choice** |
+| 12 | Nov 10, 12 | Large language models | Ch. 12 + notes | **Progress** |
+| 13 | Nov 17, 19 | Graph neural networks | Ch. 13 | — |
+| 14 | Nov 24 | VAEs & GANs *(no class Nov 26)* | Ch. 15, 17 | — |
 | 15 | Dec 1, 3 | Diffusion models; presentations begin | Ch. 18 | — |
 | 16 | Dec 8, 10 | Student presentations | — | **Report Dec 14** |
 

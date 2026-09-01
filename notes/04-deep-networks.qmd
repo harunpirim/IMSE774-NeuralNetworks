@@ -6,8 +6,7 @@ categories: [foundations]
 ---
 
 ::: {.lecture-meta}
-**Reading** Prince, *Understanding Deep Learning*, Chapter 4 &nbsp;·&nbsp;
-**Assignment** A3, due Sunday, September 20
+**Reading** Prince, *Understanding Deep Learning*, Chapter 4
 :::
 
 ::: {.callout-warning appearance="simple"}
