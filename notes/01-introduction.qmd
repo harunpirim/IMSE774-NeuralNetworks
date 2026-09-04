@@ -10,6 +10,20 @@ categories: [foundations]
 **UDL notebook** 1.1 (Background mathematics)
 :::
 
+::: {.callout-important appearance="simple"}
+## Assignment A1 — Foundations
+A formative notebook spanning Weeks 1 and 2: the learning paradigms, the
+supervised recipe, and the Appendix B algebra behind one layer. Every task ends
+in a self-check that tells you at once whether the idea landed.
+
+- **[▶ Open A1 in Google Colab](https://colab.research.google.com/github/harunpirim/IMSE774-NeuralNetworks/blob/main/assignments/A1-foundations.ipynb)** — nothing to install.
+
+In Colab choose **File → Save a copy in Drive** before you start. When you are
+done, **Runtime → Run all**, then **File → Download → Download .ipynb** and
+upload that file on Blackboard under **Assignment A1**, named
+`A1_<lastname>.ipynb`. The deadline is posted on Blackboard.
+:::
+
 ::: {.callout-note appearance="simple"}
 ## How to read the references in these notes
 Every section below opens with the section number and page range it covers in

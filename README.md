@@ -32,6 +32,7 @@ silently drift out of sync with the code that generated it.
 │   ├── ...
 │   └── 15-diffusion-models.qmd
 ├── notebooks/              # Colab copies of each note's code, generated
+├── assignments/            # Colab assignment notebooks (solutions/ is gitignored)
 ├── assets/
 │   ├── css/                # Site theme (SCSS + CSS)
 │   └── tex/preamble.tex    # LaTeX preamble for PDF output

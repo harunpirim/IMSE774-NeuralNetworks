@@ -58,3 +58,6 @@ data/raw/
 *.pth
 *.ckpt
 *.h5
+
+# --- Assignment solution keys (never published) ---
+assignments/solutions/
