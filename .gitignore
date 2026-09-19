@@ -44,6 +44,8 @@ submissions/
 grades/
 *-grades.csv
 Midterm-MCQ.*
+# In-class review and exam papers with their keys (see exams/README.md).
+exams/
 
 # --- Legacy source files kept locally, not published ---
 lnotes/

@@ -21,6 +21,22 @@ format:
 **UDL notebooks** 3.1–3.4
 :::
 
+::: {.callout-important appearance="simple"}
+## Assignment A2 — Shallow and Deep Networks
+A formative notebook spanning Weeks 3 and 4: joints, activation patterns, and
+slopes of a shallow network; counting regions and parameters; composition,
+folding, and clipping; the matrix form of a deep network; and what a trained
+network actually realizes. Every task ends in a self-check that tells you at
+once whether the idea landed.
+
+- **[▶ Open A2 in Google Colab](https://colab.research.google.com/github/harunpirim/IMSE774-NeuralNetworks/blob/main/assignments/A2-shallow-and-deep.ipynb)** — nothing to install.
+
+In Colab choose **File → Save a copy in Drive** before you start. When you are
+done, **Runtime → Run all**, then **File → Download → Download .ipynb** and
+upload that file on Blackboard under **Assignment A2**, named
+`A2_<lastname>.ipynb`. The deadline is posted on Blackboard.
+:::
+
 ::: {.callout-note appearance="simple"}
 ## How to read the references in these notes
 Every section below opens with the section number and page range it covers in
