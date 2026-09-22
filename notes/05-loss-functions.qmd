@@ -1017,7 +1017,7 @@ equation above.
 | binary classification | @eq-bce | `nn.BCEWithLogitsLoss` | **logits** and $\{0,1\}$ target |
 | multiclass classification | @eq-ce-multi | `nn.CrossEntropyLoss` | **logits** and integer class index |
 
-: PyTorch's built-in losses and the equations they implement. {tbl-colwidths="[28,16,30,26]"}
+: PyTorch’s built-in losses and the equations they implement. {tbl-colwidths="[20,13,38,29]"}
 
 The first check is that they really are the equations, with no hidden constants
 beyond the choice of `reduction`.
