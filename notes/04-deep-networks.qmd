@@ -38,6 +38,15 @@ upload that file on Blackboard under **Assignment A2**, named
 :::
 
 ::: {.callout-note appearance="simple"}
+## Review Quiz, Chapters 1–4 — Solution
+The answer key to the in-class multiple-choice review of Weeks 1–4, with the
+rationale for each answer and the section and page in Prince where the idea is
+covered.
+
+- **[📄 Download the solution (PDF)](files/review-ch1-4-mcq-key.pdf)**
+:::
+
+::: {.callout-note appearance="simple"}
 ## How to read the references in these notes
 Every section below opens with the section number and page range it covers in
 Prince, *Understanding Deep Learning* (MIT Press, 2024). Page numbers are those

@@ -9,6 +9,8 @@ project:
   # Built by flyer/build.sh, not by Quarto, so ship it as a static resource.
   resources:
     - flyer/flyer.pdf
+    # Built from exams/ (gitignored) and copied here once released to students.
+    - notes/files/*.pdf
 
 website:
   title: "IMSE 774 · Neural Networks"
