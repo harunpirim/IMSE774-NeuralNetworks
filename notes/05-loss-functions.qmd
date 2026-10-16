@@ -51,6 +51,7 @@ here. All of it — every cell, in the order the note uses it — is in a notebo
 you can open in the browser with nothing to install:
 
 - **[▶ Open the Week 5 notebook in Google Colab](https://colab.research.google.com/github/harunpirim/IMSE774-NeuralNetworks/blob/main/notebooks/week05-loss-functions.ipynb)** — all of this page's code, in order.
+- **[▶ Open A3 in Google Colab](https://colab.research.google.com/github/harunpirim/IMSE774-NeuralNetworks/blob/main/assignments/A3-midterm-review.ipynb)** — the midterm review assignment, Chapters 1–7 in code; nothing to install.
 - **[▶ UDL notebook 5.1 — Least squares loss](https://colab.research.google.com/github/udlbook/udlbook/blob/main/Notebooks/Chap05/5_1_Least_Squares_Loss.ipynb)** — the loss surface of @eq-least-squares for a one-parameter model.
 - **[▶ UDL notebook 5.2 — Binary cross-entropy loss](https://colab.research.google.com/github/udlbook/udlbook/blob/main/Notebooks/Chap05/5_2_Binary_Cross_Entropy_Loss.ipynb)** — the Bernoulli construction of @eq-bce, step by step.
 - **[▶ UDL notebook 5.3 — Multiclass cross-entropy loss](https://colab.research.google.com/github/udlbook/udlbook/blob/main/Notebooks/Chap05/5_3_Multiclass_Cross_entropy_Loss.ipynb)** — softmax and the categorical distribution of @eq-ce-multi.

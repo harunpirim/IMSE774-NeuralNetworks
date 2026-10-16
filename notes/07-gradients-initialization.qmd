@@ -51,6 +51,7 @@ here. All of it — every cell, in the order the note uses it — is in a notebo
 you can open in the browser with nothing to install:
 
 - **[▶ Open the Week 7 notebook in Google Colab](https://colab.research.google.com/github/harunpirim/IMSE774-NeuralNetworks/blob/main/notebooks/week07-gradients-initialization.ipynb)** — all of this page's code, in order.
+- **[▶ Open A3 in Google Colab](https://colab.research.google.com/github/harunpirim/IMSE774-NeuralNetworks/blob/main/assignments/A3-midterm-review.ipynb)** — the midterm review assignment, Chapters 1–7 in code; nothing to install.
 - **[▶ UDL notebook 7.1 — Backpropagation in toy model](https://colab.research.google.com/github/udlbook/udlbook/blob/main/Notebooks/Chap07/7_1_Backpropagation_in_Toy_Model.ipynb)** — the forward and backward passes of §7.3, one line at a time.
 - **[▶ UDL notebook 7.2 — Backpropagation](https://colab.research.google.com/github/udlbook/udlbook/blob/main/Notebooks/Chap07/7_2_Backpropagation.ipynb)** — @eq-bp-forward–@eq-bp-first for a deep ReLU network.
 - **[▶ UDL notebook 7.3 — Initialization](https://colab.research.google.com/github/udlbook/udlbook/blob/main/Notebooks/Chap07/7_3_Initialization.ipynb)** — the experiment of @fig-udl-7-7.

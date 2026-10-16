@@ -51,6 +51,7 @@ here. All of it — every cell, in the order the note uses it — is in a notebo
 you can open in the browser with nothing to install:
 
 - **[▶ Open the Week 6 notebook in Google Colab](https://colab.research.google.com/github/harunpirim/IMSE774-NeuralNetworks/blob/main/notebooks/week06-fitting-models.ipynb)** — all of this page's code, in order.
+- **[▶ Open A3 in Google Colab](https://colab.research.google.com/github/harunpirim/IMSE774-NeuralNetworks/blob/main/assignments/A3-midterm-review.ipynb)** — the midterm review assignment, Chapters 1–7 in code; nothing to install.
 - **[▶ UDL notebook 6.1 — Line search](https://colab.research.google.com/github/udlbook/udlbook/blob/main/Notebooks/Chap06/6_1_Line_Search.ipynb)** — the bracketing search of @fig-udl-6-10 on a one-dimensional loss.
 - **[▶ UDL notebook 6.2 — Gradient descent](https://colab.research.google.com/github/udlbook/udlbook/blob/main/Notebooks/Chap06/6_2_Gradient_Descent.ipynb)** — @fig-udl-6-1 from scratch.
 - **[▶ UDL notebook 6.3 — Stochastic gradient descent](https://colab.research.google.com/github/udlbook/udlbook/blob/main/Notebooks/Chap06/6_3_Stochastic_Gradient_Descent.ipynb)** — the Gabor model of @eq-gabor, full-batch and stochastic.
