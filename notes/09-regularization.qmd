@@ -36,11 +36,11 @@ are ours. A complete cross-reference table appears in @sec-reference-map.
 By the end of this week you should be able to:
 
 1. Define **regularization** in its strict sense — an extra term in the loss that favors some parameters over others — and in the broad sense the field uses, and say why the broad sense exists.
-2. Read a regularized loss as a **maximum a posteriori** (MAP) criterion and translate between a penalty $\lambda\, g[\boldsymbol{\phi}]$ and a prior $Pr(\boldsymbol{\phi})$; derive the normal prior behind **L2 regularization**.
+2. Read a regularized loss as a **maximum a posteriori** (MAP) criterion and translate between a penalty $\lambda\, g[\boldsymbol{\phi}]$ and a prior $Pr(\boldsymbol{\phi})$; derive $\lambda$ from the variance of the normal prior behind **L2 regularization**, the gradient it adds, and its equivalence to the **weight decay** update under SGD.
 3. Explain what L2 regularization (**weight decay**) does to a network's function and why it trades variance for bias, and distinguish L2 regularization from the weight-decay update when the optimizer is Adam.
 4. State what **implicit regularization** means, give the modified losses that gradient descent and SGD actually descend, and connect them to the empirical finding that large learning rates and small batches generalize better.
 5. Explain how **early stopping**, **ensembling** (including bagging), **dropout**, **noise injection**, **label smoothing**, the **Bayesian approach**, **transfer**, **multi-task**, and **self-supervised learning**, and **data augmentation** each improve generalization, and place each in Prince's four mechanisms.
-6. Derive the finite logit gap that label smoothing asks for, and the weight-scaling rule for dropout at inference.
+6. Derive the penalty that input noise adds to a regression loss, the finite logit gap that label smoothing asks for, and the weight-scaling rule for dropout at inference.
 7. Choose a regularization strategy for a small, noisy industrial dataset and justify it.
 
 ::: {.callout-tip}
@@ -136,6 +136,17 @@ of them into four mechanisms, and it is worth keeping in view from the start:
 make the function **smoother**, get **more data**, **combine models**, or find a
 **wider minimum**.
 
+::: {.callout-note appearance="simple"}
+## How this page is weighted
+The passages of Chapter 9 highlighted in the assigned reading get the most
+space here: what the regularization term is and what it assumes (§9.1), and the
+practitioner's toolkit of §9.3 — early stopping, ensembles, dropout, noise and
+label smoothing, transfer and self-supervised learning, augmentation — with the
+chapter's problems 9.1–9.5 worked out where they belong. The derivation of
+implicit regularization (§9.2) and the Bayesian approach (§9.3.5) are kept
+shorter; read them for the idea rather than the algebra.
+:::
+
 ## Explicit Regularization
 
 *Prince §9.1, pp. 138–139; figure on p. 139.*
@@ -162,6 +173,12 @@ Gabor loss from Week 6: a bowl-shaped penalty centered on the origin is added
 to the loss surface, the sum has fewer local minima, and the global minimum
 has moved.
 
+Three things to notice about @eq-reg before going further.
+
+- **$\lambda$ is a dial between two objectives.** At $\lambda = 0$ we recover @eq-unreg and the data alone decide. As $\lambda \to \infty$ the data stop mattering and $\boldsymbol{\phi}$ goes to whatever minimizes $g$ alone — for the L2 penalty below, all zeros. Everything useful happens in between, and the right $\lambda$ is a **hyperparameter** chosen on a validation set exactly as in Chapter 8; it is never visible in the training loss, which the penalty can only make worse.
+- **The scale of $\lambda$ depends on how the loss is written.** Prince sums the $I$ per-example losses, so the data term grows with $I$ and a fixed $\lambda$ matters less as the training set grows — more data needs less regularization, which is the right behaviour. PyTorch's losses *average* over the batch by default, so the $\lambda$ (or `weight_decay`) you read in a paper written for one convention does not transfer to the other without rescaling.
+- **The penalty changes the minimum, not just the path.** Compare with §9.2 below, where the optimizer's implicit preferences bend the trajectory but leave the minima where they were. An explicit term is the only kind of regularization that actually relocates the solution the loss is asking for.
+
 ![Prince (2024), figure 9.1, p. 139.](images/ch09/fig-9-01-explicit-regularization.png){#fig-udl-9-1 width=88%}
 
 ### Probabilistic interpretation
@@ -183,11 +200,39 @@ $$
 \hat{\boldsymbol{\phi}} = \underset{\boldsymbol{\phi}}{\operatorname{argmax}} \Big[ \prod_{i=1}^{I} Pr(y_i \mid \mathbf{x}_i, \boldsymbol{\phi})\, Pr(\boldsymbol{\phi}) \Big].
 $$ {#eq-map}
 
-Take the negative log, as in Week 5, and the product becomes the usual sum of
-loss terms plus one more: $\lambda \cdot g[\boldsymbol{\phi}] = -\log
-Pr(\boldsymbol{\phi})$. Every penalty is a prior and every prior is a penalty.
-The dictionary runs both ways, and it tells you what a given regularizer is
-*assuming*.
+Take the negative log, as in Week 5. The log of a product is a sum of logs, so
+
+$$
+-\log\Big[\prod_{i=1}^{I} Pr(y_i \mid \mathbf{x}_i, \boldsymbol{\phi})\, Pr(\boldsymbol{\phi})\Big]
+= \underbrace{\sum_{i=1}^{I} -\log Pr(y_i \mid \mathbf{x}_i, \boldsymbol{\phi})}_{\sum_i \ell_i[\mathbf{x}_i, y_i]} \; \underbrace{- \log Pr(\boldsymbol{\phi})}_{\lambda \cdot g[\boldsymbol{\phi}]},
+$$ {#eq-map-loss}
+
+and the regularized loss of @eq-reg appears with $\lambda \cdot g[\boldsymbol{\phi}]
+= -\log Pr(\boldsymbol{\phi})$. Every penalty is a prior and every prior is a
+penalty. The dictionary runs both ways, and it tells you what a given
+regularizer is *assuming*: a penalty that grows with $|\phi_j|$ is the statement
+"before seeing data, I believe large parameters are improbable."
+
+::: {.callout-important}
+## Worked: a normal prior is L2 regularization (problem 9.1)
+Suppose each parameter independently has a zero-mean normal prior with variance
+$\sigma^2_\phi$, $Pr(\boldsymbol{\phi}) = \prod_{j} \mathrm{Norm}_{\phi_j}[0,
+\sigma^2_\phi]$. Its negative log is
+$$
+-\log Pr(\boldsymbol{\phi}) = \sum_j \Big[ \tfrac{1}{2}\log(2\pi\sigma^2_\phi) + \frac{\phi_j^2}{2\sigma^2_\phi} \Big] = \frac{1}{2\sigma^2_\phi} \sum_j \phi_j^2 + \text{const}.
+$$ {#eq-normal-prior}
+The constant does not depend on $\boldsymbol{\phi}$ and drops out of the
+argmin, leaving exactly the L2 term of @eq-l2 with
+$$
+\lambda = \frac{1}{2\sigma^2_\phi}.
+$$ {#eq-lambda-sigma}
+So the regularization strength *is* the prior's tightness: a prior that only
+believes in small parameters (small $\sigma^2_\phi$) is a large $\lambda$, and
+a vague prior ($\sigma^2_\phi \to \infty$) is no regularization at all. The
+same calculation with a Laplace prior, $Pr(\phi_j) \propto e^{-|\phi_j|/b}$,
+gives the L1 penalty $\sum_j |\phi_j| / b$ of the chapter notes, which pushes
+some parameters to exactly zero.
+:::
 
 ### L2 regularization
 
@@ -202,20 +247,50 @@ $$
 $$ {#eq-l2}
 
 Other names for the same thing are **Tikhonov regularization**, **ridge
-regression**, and, for weight matrices, **Frobenius norm regularization**. In
-the MAP dictionary it is a normal prior: $-\log \prod_j
-\mathrm{Norm}_{\phi_j}[0, \sigma^2_\phi] = \sum_j \phi_j^2 / (2\sigma^2_\phi) +
-\text{const}$, so $\lambda = 1/(2\sigma^2_\phi)$ — a *tight* prior is a *large*
-$\lambda$ (problem 9.1). For networks the penalty is normally applied to the
-weights and not the biases, and is then called a **weight decay** term.
+regression**, and, for weight matrices, **Frobenius norm regularization** (the
+Frobenius norm of a matrix is the square root of the sum of its squared
+entries, so penalizing it squared is the same sum). As the callout above showed,
+it is the normal prior with $\lambda = 1/(2\sigma^2_\phi)$.
 
-What does it do to the function? The output is a weighted sum of the last
-hidden layer's activations; smaller weights mean the output varies less. The
-same argument applies to the pre-activations of the last hidden layer, and so
-on back through the network. Push the weights all the way to zero and the
-network outputs a constant, its final bias. L2 regularization therefore makes
-the function **smoother**, and $\lambda$ sets how much smoothness we buy at the
-expense of fitting the data. @fig-udl-9-2 shows the trade on the simplified
+**Weights, not biases.** For networks the penalty is normally applied to the
+weights $\boldsymbol{\Omega}_k$ and not the biases $\boldsymbol{\beta}_k$, and
+is then called a **weight decay** term. The reason is what each kind of
+parameter does. A weight multiplies an activation, so its size sets how steeply
+the function can change; a bias only shifts where a ReLU's joint sits or where
+the output is centred. Shrinking biases toward zero would not make the function
+smoother, it would just drag every joint toward the origin and the output
+toward zero — a preference with no justification.
+
+**What the gradient sees (problem 9.2).** Adding $\lambda\sum_j \phi_j^2$ to the
+loss adds $2\lambda\phi_j$ to every component of the gradient:
+$$
+\frac{\partial}{\partial \boldsymbol{\phi}} \Big[ L[\boldsymbol{\phi}] + \lambda \sum_j \phi_j^2 \Big] = \frac{\partial L}{\partial \boldsymbol{\phi}} + 2\lambda\boldsymbol{\phi},
+$$ {#eq-l2-gradient}
+so a gradient descent step becomes
+$$
+\boldsymbol{\phi} \longleftarrow \boldsymbol{\phi} - \alpha\Big(\frac{\partial L}{\partial \boldsymbol{\phi}} + 2\lambda\boldsymbol{\phi}\Big) = (1 - 2\alpha\lambda)\,\boldsymbol{\phi} - \alpha\frac{\partial L}{\partial \boldsymbol{\phi}}.
+$$ {#eq-l2-step}
+Every iteration first multiplies the parameters by a number slightly below one
+and then takes the usual step. That is where the name *weight decay* comes
+from, and @eq-l2-step is problem 9.5 read backwards: the decay update
+$\boldsymbol{\phi} \leftarrow (1 - \lambda')\boldsymbol{\phi} - \alpha\,\partial
+L/\partial\boldsymbol{\phi}$ is a plain gradient step on the L2-regularized loss
+with $\lambda = \lambda'/(2\alpha)$. Note also what @eq-l2-gradient says about
+*which* parameters are affected most: the pull toward zero is proportional to
+the parameter itself, so large weights are shrunk hard and weights already near
+zero are barely touched.
+
+**Why smaller weights mean a smoother function.** The output of a network is a
+weighted sum of the last hidden layer's activations; smaller weights mean the
+output varies less when those activations change. The same argument applies to
+the pre-activations of the last hidden layer in terms of the layer before, and
+so on back through the network. Week 3 makes this concrete for a ReLU network:
+the slope of the output in any linear region is a sum of products of weights
+along the active paths, so bounding the weights bounds every slope the function
+can have. Push the weights all the way to zero and no path carries anything;
+the network outputs a constant, its final bias. L2 regularization therefore
+makes the function **smoother**, and $\lambda$ sets how much smoothness we buy
+at the expense of fitting the data. @fig-udl-9-2 shows the trade on the simplified
 network of Week 8: at small $\lambda$ the fit passes through every noisy point;
 at intermediate $\lambda$ it is smoother and closer to the truth; at large
 $\lambda$ it is smoother than the truth and the fit is worse.
@@ -462,11 +537,32 @@ bias–variance curve from the critical region of Chapter 8.
 
 ![Prince (2024), figure 9.6, p. 146.](images/ch09/fig-9-06-early-stopping.png){#fig-udl-9-6 width=86%}
 
+"Reduces the effective complexity" deserves a concrete picture. Training from
+small initial weights, gradient descent fits the *stiff* directions of the loss
+first — the broad features of the function that many data points agree on —
+and the *soft* directions, which encode fine wiggles supported by one or two
+noisy points, only after many more iterations. At any finite stopping time the
+soft components are still close to their initial value of zero. The model is
+behaving as if it had fewer free parameters than it has, which is precisely what
+a small $\lambda$ in L2 regularization does by shrinking those same components.
+The figure below puts the two on one axis.
+
 Early stopping has one hyperparameter, the stopping time, chosen on a
 validation set as usual — but unlike every other hyperparameter it does not
-require training many models. Train once, evaluate on the validation set every
-$T$ iterations, keep a copy of the model each time, and at the end take the copy
-with the best validation score.
+require training many models.
+
+::: {.callout-note}
+## The early-stopping procedure
+1. Split off a validation set, as in Chapter 8.
+2. Train once. Every $T$ iterations, evaluate the validation loss and **save a copy** of the current parameters (a "checkpoint").
+3. Continue until the validation loss has clearly stopped improving — in practice, until it has not improved for a fixed number of checks, the **patience**.
+4. Discard the final model and **restore the checkpoint** with the best validation loss.
+
+One training run yields every candidate stopping time at once; the validation
+curve is the hyperparameter sweep. In PyTorch this is a few lines around the
+training loop: `best = copy.deepcopy(model.state_dict())` when the validation
+loss improves, `model.load_state_dict(best)` at the end.
+:::
 
 For our simplified model the whole training trajectory of full-batch gradient
 descent has a closed form (it is a linear least squares problem, so the flow
@@ -520,21 +616,49 @@ print(f"trained to convergence:  error {test_t[-1]:.4f}, training error {train_t
 *Prince §9.3.2, pp. 145–147; figure on p. 147.*
 
 Build several models and average their predictions: an **ensemble**. This
-reliably improves test performance, at the cost of training and storing several
-models and running them all at inference. For regression, average the outputs;
-for classification, average the pre-softmax activations. The premise is that the
-models' errors are independent and cancel. Taking the median output, or the most
-frequent class, gives a more robust variant.
+reliably improves test performance — it is the most dependable trick in the
+chapter — at the cost of training and storing several models and running all of
+them at inference.
 
-Where do different models come from? The simplest source is **different random
+**How to combine.** For regression, average the outputs. For classification,
+Prince averages the *pre-softmax activations* (the logits) rather than the
+probabilities. Both work; averaging logits amounts to a geometric mean of the
+models' probability vectors, which keeps a confident model's relative
+preferences intact, whereas averaging probabilities is an arithmetic mean that
+lets confident and unsure models contribute equally to each class. Taking the
+**median** output, or the **most frequent** predicted class, is a more robust
+variant: one model that goes badly wrong on an input cannot drag the ensemble
+with it.
+
+**Why it works, and when it does not.** The premise is that the models' errors
+are independent and cancel. If $M$ models each have error variance $\sigma^2$
+and the errors of any two are correlated with coefficient $\rho$, the variance
+of their average is
+
+$$
+\operatorname{Var}\Big[\frac{1}{M}\sum_{m=1}^{M} e_m\Big] = \sigma^2\Big(\rho + \frac{1-\rho}{M}\Big).
+$$ {#eq-ensemble-variance}
+
+With independent errors ($\rho = 0$) the variance falls like $1/M$. With
+correlated errors it never falls below $\rho\sigma^2$ however many models we add.
+So an ensemble is only as good as the *diversity* of its members: ten copies of
+the same model trained on the same data from the same start are one model. (The
+bias of each model is untouched by averaging; ensembling is a variance
+reduction, the third of the four mechanisms.)
+
+**Where diversity comes from.** The simplest source is **different random
 initializations**. This helps most in regions far from the training data, where
-each model is unconstrained and they disagree, so their average is more moderate
-than any one of them. A second source is **bagging** — bootstrap aggregating:
-resample the training set with replacement to make several datasets, and train
-one model on each (@fig-udl-9-7). A point left out of one resample is
-interpolated from its neighbors by that model, so an outlier's influence is
-diluted and the average is smoother. Other sources are different
-hyperparameters or entirely different model families.
+each model is unconstrained, the models disagree, and their average is more
+moderate than any one of them. A second source is **bagging** — bootstrap
+aggregating [@breiman1996]: draw $I$ examples *with replacement* from the $I$
+training points to make a new training set, repeat to make several, and train
+one model on each (@fig-udl-9-7). A bootstrap sample contains about 63% of the
+original points, some of them more than once, and omits the other 37% — the
+sizes of the orange dots in the figure show the counts. A point left out of one
+resample is interpolated from its neighbors by that model, so an outlier's
+influence is diluted and the average is smoother than any single fit. Other
+sources of diversity are different hyperparameters, models stored at different
+times during one training run, or entirely different model families.
 
 ![Prince (2024), figure 9.7, p. 147.](images/ch09/fig-9-07-ensembles.png){#fig-udl-9-7 width=86%}
 
@@ -551,6 +675,9 @@ for _ in range(200):
     single.append(np.mean((f_single - mu(x_grid)) ** 2)); bagged.append(np.mean((f_bag - mu(x_grid)) ** 2))
 print(f"error vs. true function, median over 200 training sets:  single model {np.median(single):.4f}   bagged ensemble of 20 {np.median(bagged):.4f}")
 print(f"the ensemble is better on {np.mean(np.array(bagged) < np.array(single)):.0%} of the training sets")
+
+unique_frac = np.mean([len(np.unique(rng.integers(0, I, I))) / I for _ in range(2000)])
+print(f"a bootstrap resample of {I} points contains on average {unique_frac:.0%} distinct points (the limit is 1 - 1/e = {1 - np.exp(-1):.0%})")
 ```
 
 ### Dropout
@@ -558,10 +685,21 @@ print(f"the ensemble is better on {np.mean(np.array(bagged) < np.array(single)):
 *Prince §9.3.3, pp. 147–149; figures on pp. 148–149.*
 
 **Dropout** randomly clamps a subset of hidden units — typically half — to zero
-at every SGD iteration (@fig-udl-9-8). Each step therefore trains a slightly
-different network. The network cannot rely on any particular unit, and the
-weights are pushed smaller so that the function changes less when a unit comes
-or goes.
+at every SGD iteration (@fig-udl-9-8). Clamping a unit to zero is the same as
+temporarily removing it: its incoming weights receive no gradient and its
+outgoing weights contribute nothing, so each step trains a slightly different,
+thinner network, and the next step a different one again.
+
+Two consequences follow. First, the network **cannot rely on any particular
+unit**, because that unit may be absent when the loss is computed. A feature
+that is only useful in combination with three specific other units — a
+"co-adaptation" — is fragile under dropout, so the training pressure favours
+units that are individually useful. Second, the **weights are pushed smaller**:
+when a unit disappears, the function changes by the size of that unit's
+contribution, and the loss penalizes large swings, so the network learns to
+spread its function over many small contributions rather than a few large
+ones. That is the same smoothness L2 regularization buys, obtained by a
+different route.
 
 ![Prince (2024), figure 9.8, p. 148.](images/ch09/fig-9-08-dropout.png){#fig-udl-9-8 width=74%}
 
@@ -579,14 +717,24 @@ unnecessary changes between training points even though they cost nothing.
 
 ![Prince (2024), figure 9.9, p. 149.](images/ch09/fig-9-09-dropout-mechanism.png){#fig-udl-9-9 width=88%}
 
-At test time there are two options. Run the full network with every unit on, but
-since it now has more active units than it ever did in training, multiply the
-weights by one minus the dropout probability — the **weight scaling inference
-rule**. Or run the network several times with random units dropped, as in
-training, and combine the results: **Monte Carlo dropout** [@gal2016], which is
-an ensemble of networks that share one set of weights and so never needed to be
-trained or stored separately, and whose spread is a rough measure of the
-model's uncertainty.
+At test time there are two options.
+
+**Weight scaling inference rule.** Run the full network with every unit on. But
+the next layer was trained on inputs where each unit was present only a fraction
+$1 - p$ of the time: during training the *expected* contribution of unit $j$ to
+a downstream pre-activation was $(1 - p)\,\omega_j h_j$. With every unit present
+the contribution is $\omega_j h_j$, larger by $1/(1 - p)$, and the pre-activations
+would be systematically too big. So multiply the weights by $1 - p$ at inference
+(with $p = 0.5$, halve them) to restore the expectation the network was trained
+under. This is a single deterministic pass and costs nothing.
+
+**Monte Carlo dropout** [@gal2016]. Alternatively, keep dropout *on* at test
+time, run the network several times with different random subsets of units
+clamped to zero, and average the results. Every random thinning is a different
+model, so this is an ensemble — but one whose members share a single set of
+weights and so never had to be trained or stored separately. The spread of the
+passes is a rough measure of the model's uncertainty, which the single
+deterministic pass cannot give.
 
 ::: {.callout-note}
 ## Dropout in PyTorch
@@ -649,19 +797,70 @@ Dropout is multiplicative Bernoulli noise on the activations. Once you see it
 that way, noise can be applied anywhere in the network during training, and in
 each place it buys a different kind of robustness.
 
-**Noise on the inputs** smooths the learned function (@fig-udl-9-10). For
-regression it is equivalent to penalizing the derivatives of the output with
-respect to the input [@bishop1995] — problem 9.3 works out the expected gradient
-for a line. The extreme version is **adversarial training**, in which the
-optimizer actively searches for the small input perturbation that most changes
-the output and trains against it: worst-case noise.
+**Noise on the inputs** smooths the learned function (@fig-udl-9-10). At each
+SGD step, each input $\mathbf{x}_i$ in the batch is replaced by $\mathbf{x}_i +
+\boldsymbol{\epsilon}_i$ with fresh Gaussian noise of variance $\sigma^2_x$. The
+model can no longer pin a prediction to one exact input; it has to predict
+about the same thing across a small neighbourhood, which is what "smooth"
+means. For regression this is equivalent to adding a penalty on the derivatives
+of the output with respect to the input [@bishop1995], and for a straight line
+the equivalence is exact.
+
+::: {.callout-important}
+## Worked: input noise on a line is an L2 penalty on the slope (problem 9.3)
+For $y = \phi_0 + \phi_1 x$ with the least squares loss, add noise $\epsilon_i
+\sim \mathrm{Norm}[0, \sigma^2_x]$ to each input. One term of the loss is
+$$
+\big(\phi_0 + \phi_1(x_i + \epsilon_i) - y_i\big)^2 = \big(\phi_0 + \phi_1 x_i - y_i\big)^2 + 2\phi_1\epsilon_i\big(\phi_0 + \phi_1 x_i - y_i\big) + \phi_1^2\epsilon_i^2.
+$$
+Taking the expectation over the noise kills the middle term ($\mathbb{E}[\epsilon_i] = 0$)
+and turns the last into $\phi_1^2\sigma^2_x$. Summed over the $I$ examples,
+$$
+\mathbb{E}_{\epsilon}\big[L_{\text{noisy}}[\boldsymbol{\phi}]\big] = L[\boldsymbol{\phi}] + I\sigma^2_x\,\phi_1^2,
+$$ {#eq-input-noise}
+the original loss plus an L2 penalty on the slope $\phi_1 = \partial y / \partial x$
+— the derivative of the output with respect to the input — with $\lambda =
+I\sigma^2_x$. The intercept is not penalized, because shifting the line up or
+down does not change how sensitive it is to the input. The expected gradient
+update is therefore the usual one plus $2 I \sigma^2_x \phi_1$ on the slope
+alone. For a nonlinear network the same calculation holds locally: input noise
+penalizes $\|\partial \mathrm{f} / \partial \mathbf{x}\|^2$ averaged over the
+training inputs.
+:::
+
+```{python}
+#| label: input-noise
+
+rng = np.random.default_rng(774)
+I_n, sigma_x = 20, 0.3
+x_n = rng.uniform(-1, 1, I_n); y_n = 0.5 + 1.5 * x_n + rng.normal(0, 0.2, I_n)
+phi = np.array([0.3, 0.9])                                               # any parameter setting
+
+def loss_line(xs):
+    return np.sum((phi[0] + phi[1] * xs - y_n) ** 2)
+
+noisy = np.mean([loss_line(x_n + rng.normal(0, sigma_x, I_n)) for _ in range(100000)])
+print(f"expected loss with input noise (Monte Carlo):   {noisy:.4f}")
+print(f"L + I sigma_x^2 phi_1^2, equation (input noise): {loss_line(x_n) + I_n * sigma_x ** 2 * phi[1] ** 2:.4f}")
+```
+
+The extreme version is **adversarial training**, in which the optimizer does
+not sample the perturbation at random but actively *searches* for the small
+$\boldsymbol{\epsilon}_i$ that most increases the loss — the worst-case noise —
+and trains against that.
 
 ![Prince (2024), figure 9.10, p. 150.](images/ch09/fig-9-10-input-noise.png){#fig-udl-9-10 width=88%}
 
 **Noise on the weights** asks the network to predict sensibly even when its
-parameters are slightly wrong. Training then settles into **wide, flat minima**,
-where the individual weights do not matter much — the fourth of the four
-mechanisms.
+parameters are slightly wrong. Picture two minima of the loss with the same
+depth: one at the bottom of a narrow, sharp valley, one in the middle of a
+wide, flat basin. Perturb the parameters by a small random amount and the loss
+at the sharp minimum jumps, while the loss at the flat one barely moves.
+Training on the *expected* loss under weight noise — to second order,
+$L[\boldsymbol{\phi}] + \tfrac{1}{2}\sigma^2_\phi\,\mathrm{tr}[\mathbf{H}]$, a penalty
+on the curvature — therefore steers toward **wide, flat minima**, where the
+individual weights do not matter much. Such solutions are robust to the
+estimation error in every weight, which is the fourth of the four mechanisms.
 
 **Noise on the labels.** The multiclass cross-entropy wants to predict the
 correct class with *certainty*, which drives the pre-softmax activations toward
@@ -672,9 +871,23 @@ from changing the *target* of the cross-entropy to a distribution with $1 - \rho
 on the true class and $\rho/(K-1)$ on each of the others. This is **label
 smoothing** [@szegedy2016], and it helps across many tasks, although the
 mechanism is not fully understood; it does improve the calibration of the
-predicted probabilities [@muller2019]. The smoothed target cannot be matched by
-an infinitely confident prediction, so the logits stop growing — and we can say
-exactly where.
+predicted probabilities [@muller2019].
+
+Writing the smoothed loss out (problem 9.4) shows what it does. With $K$ classes,
+predicted probabilities $p_k$ from the softmax, true class $y$, and a target
+that puts $1 - \rho$ on $y$ and $\rho / (K - 1)$ on each other class, the
+cross-entropy between target and prediction is
+
+$$
+\ell = -(1 - \rho)\log p_y - \frac{\rho}{K - 1}\sum_{k \neq y} \log p_k
+= (1 - \rho)\,\underbrace{\big[-\log p_y\big]}_{\text{usual loss}} + \rho\,\underbrace{\Big[-\frac{1}{K-1}\sum_{k \neq y}\log p_k\Big]}_{\text{keeps every class alive}}.
+$$ {#eq-label-smoothing}
+
+The first term is the ordinary cross-entropy of Chapter 5, down-weighted by
+$1 - \rho$. The second term is new: it grows without bound if any wrong class's
+probability is driven to zero, so the network is penalized for being certain.
+The smoothed target cannot be matched by an infinitely confident prediction,
+and the logits stop growing — and we can say exactly where.
 
 ```{python}
 #| label: label-smoothing
@@ -746,19 +959,58 @@ cheap approximation of this kind.
 *Prince §9.3.6, pp. 151–152; figure on p. 153.*
 
 When labeled data for the task are scarce, use someone else's data. In
-**transfer learning** (@fig-udl-9-12**a**) the network is first trained on a
-related *secondary* task for which data are plentiful; then the last layer is
-removed, new layers suited to the real task are added, and either only the new
-layers are trained or the whole network is **fine-tuned**. The premise is that the
-secondary task teaches a good internal representation of the data — or,
-equivalently, that pre-training initializes most of the parameters in a part of
-the space from which a good solution is reachable. Chapter 7's view of
-initialization, extended.
+**transfer learning** (@fig-udl-9-12**a**) the network is first **pre-trained**
+on a related *secondary* task for which data are plentiful — a million labeled
+photographs, say, or every image on the web with its caption. Then the last
+layer, which produced the secondary task's outputs, is removed, and one or more
+new layers that produce the outputs we actually want are added in its place.
+From here there are two choices:
+
+- **Freeze and train the head.** Keep every pre-trained parameter fixed and train only the new layers. The pre-trained network becomes a fixed feature extractor; the new head is a small model, often a single linear layer, that cannot overfit much even on a few hundred examples.
+- **Fine-tune.** Train the whole network on the new task, usually with a small learning rate so that the pre-trained parameters move only a little. This fits better when there are enough new data to justify the extra freedom, and when the new inputs differ from the pre-training inputs — thermal images instead of photographs, for instance.
+
+The premise is that the secondary task teaches a good **internal
+representation** of the data: the early layers of an image network learn edges,
+textures, and parts that are useful for almost any image task, and only the
+last layers are specific to the labels they were trained on. Equivalently,
+pre-training initializes most of the parameters in a part of parameter space
+from which a good solution is reachable — Chapter 7's view of initialization,
+extended from "keep the variances level" to "start from a network that already
+sees." The cell below shows the mechanics on a standard image network.
+
+```{python}
+#| label: transfer-head
+
+import torchvision
+
+net = torchvision.models.resnet18(weights=None)           # the architecture of Chapter 11; weights="DEFAULT" would load ImageNet pre-training
+n_total = sum(p.numel() for p in net.parameters())
+print(f"ResNet-18: {n_total:,} parameters; its last layer is {net.fc}")
+
+for p in net.parameters():                                 # freeze everything that was pre-trained
+    p.requires_grad = False
+net.fc = nn.Linear(net.fc.in_features, 4)                   # a new head for a four-class inspection task
+n_head = sum(p.numel() for p in net.parameters() if p.requires_grad)
+print(f"frozen backbone + new head: {n_head:,} trainable parameters ({n_head / n_total:.2%} of the model)")
+
+for p in net.layer4.parameters():                           # fine-tune the last block as well
+    p.requires_grad = True
+n_ft = sum(p.numel() for p in net.parameters() if p.requires_grad)
+print(f"also fine-tuning the last residual block: {n_ft:,} trainable parameters")
+```
+
+With the backbone frozen, a four-class classifier has two thousand free
+parameters — a model a few hundred labeled images can constrain — sitting on
+top of eleven million that were constrained by someone else's million images.
+That is the sense in which transfer learning "increases the data."
 
 **Multi-task learning** (@fig-udl-9-12**b**) trains one network on several tasks
-at once — segment the scene, estimate depth, caption the image — on the grounds
-that all of them require understanding the image, and each may improve the
-others.
+at once — segment the scene, estimate depth, caption the image — with a shared
+trunk and one output head per task, and a loss that is a weighted sum of the
+tasks' losses. The grounds are that all of the tasks require understanding the
+image, so each task's labels constrain the shared representation and each may
+improve the others. Where transfer learning borrows a dataset, multi-task
+learning borrows *labels* for the same inputs.
 
 ![Prince (2024), figure 9.12, p. 153.](images/ch09/fig-9-12-transfer-multitask-selfsupervised.png){#fig-udl-9-12 width=82%}
 
@@ -775,6 +1027,15 @@ Chapter 12 are pre-trained [@devlin2019]. In **contrastive** self-supervision
 the task is to tell whether two examples are related: two transformed views of
 the same image versus views of different images [@chen2020simclr], or two
 sentences that did or did not follow one another in a document.
+
+The point in both families is that the labels are *free*: they are manufactured
+from the data itself, so the secondary task can use every unlabeled example we
+have. The network trained on it is then transferred exactly as above — head
+removed, new head added, frozen or fine-tuned. For an industrial sensor stream
+the generative version is natural: mask one channel, or one time window, and
+train the network to predict it from the rest; what it learns about how the
+channels relate is then a starting point for the fault-detection task with its
+few hundred labels.
 
 ### Augmentation
 
@@ -822,9 +1083,28 @@ four regions. The reasons they work are not as varied as the methods.
 
 One more lever sits outside this chapter: choose an **architecture** that suits
 the task. In image segmentation, sharing parameters across positions means the
-network need not learn what a tree looks like separately at every pixel.
-Chapters 10–13 are about such architectural choices, and the next of them —
-convolution — is the biggest regularizer in computer vision.
+network need not learn what a tree looks like separately at every pixel. The
+cell below says how large that saving is.
+
+```{python}
+#| label: parameter-sharing
+
+H, W, C = 224, 224, 3                                      # a small colour image
+dense = H * W * C * 1000                                   # one fully connected layer to 1,000 hidden units
+conv = 3 * 3 * C * 64 + 64                                 # one 3x3 convolution producing 64 channels, applied at every position
+print(f"fully connected layer, every pixel to 1,000 units: {dense:>12,} weights")
+print(f"3x3 convolution with 64 channels, shared everywhere: {conv:>12,} parameters")
+print(f"ratio: {dense / conv:,.0f} to 1")
+```
+
+A convolution is a fully connected layer with two constraints built in: each
+unit looks only at a small patch, and every position uses the *same* weights.
+Those constraints are a prior — "what matters is local, and it matters the same
+way everywhere in the image" — enforced by the architecture rather than by a
+penalty, and they remove tens of thousands of parameters per unit that would
+otherwise have to be constrained by data. Chapters 10–13 are about such
+architectural choices, and the next of them, convolution, is the biggest
+regularizer in computer vision.
 
 ::: {.callout-tip}
 ## A default recipe for a small, noisy industrial dataset
@@ -965,7 +1245,7 @@ Every part of this page, mapped to Prince, *Understanding Deep Learning*
 | — Dropout | §9.3.3; notes | 147–149, 158 | 9.8 (p. 148), 9.9 (p. 149) |
 | — Applying noise | §9.3.4; notes | 149–150, 158 | 9.10 (p. 150) |
 | — Bayesian inference | §9.3.5; notes | 150–151, 159 | 9.11 (p. 151) |
-| — Transfer learning and multi-task learning | §9.3.6 | 151–152 | 9.12 (p. 153) |
+| — Transfer learning and multi-task learning | §9.3.6; notes | 151–152, 159 | 9.12 (p. 153) |
 | — Self-supervised learning | §9.3.7; notes | 152, 159 | — |
 | — Augmentation | §9.3.8; notes | 152–154, 159–160 | 9.13 (p. 154) |
 | Four Mechanisms | §9.4 | 154–155 | 9.14 (p. 155) |
@@ -978,7 +1258,11 @@ Equations on this page correspond to Prince as follows: @eq-unreg is his
 (9.1), @eq-reg is (9.2), @eq-ml is (9.3), @eq-map is (9.4), @eq-l2 is (9.5),
 @eq-gradient-flow is (9.6), @eq-gd is (9.7), @eq-implicit-gd is (9.8),
 @eq-implicit-sgd is (9.9), @eq-means is (9.10), @eq-posterior is (9.11),
-@eq-predictive is (9.12), and @eq-weight-decay is (9.13).
+@eq-predictive is (9.12), and @eq-weight-decay is (9.13). Equations
+@eq-map-loss, @eq-normal-prior and @eq-lambda-sigma work problem 9.1,
+@eq-l2-gradient and @eq-l2-step work problems 9.2 and 9.5, @eq-input-noise works
+problem 9.3, @eq-label-smoothing works problem 9.4, and @eq-ensemble-variance is
+ours.
 
 ::: {.callout-note appearance="simple"}
 ## Figure credits
