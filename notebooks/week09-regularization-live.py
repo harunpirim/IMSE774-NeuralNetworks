@@ -19,8 +19,12 @@ def _():
     import numpy as np
     import matplotlib
     import matplotlib.pyplot as plt
-    import torch
-    import torch.nn as nn
+
+    try:                                    # torch is absent in the WebAssembly playground; only section 5 needs it
+        import torch
+        import torch.nn as nn
+    except ImportError:
+        torch = nn = None
 
     matplotlib.use("Agg")
     plt.rcParams.update({
@@ -334,8 +338,11 @@ def _(nn, np, sample, torch, x_grid):
 
     _x, _y = sample(15, np.random.default_rng(774))
     drop_x, drop_y = _x, _y
-    _X = torch.tensor(_x, dtype=torch.float32)[:, None]; _Y = torch.tensor(_y, dtype=torch.float32)[:, None]
-    drop_Xg = torch.tensor(x_grid, dtype=torch.float32)[:, None]
+    if torch is not None:
+        _X = torch.tensor(_x, dtype=torch.float32)[:, None]; _Y = torch.tensor(_y, dtype=torch.float32)[:, None]
+        drop_Xg = torch.tensor(x_grid, dtype=torch.float32)[:, None]
+    else:
+        _X = _Y = drop_Xg = None
 
     @lru_cache(maxsize=None)
     def train_dropout_net(p):
@@ -352,6 +359,7 @@ def _(nn, np, sample, torch, x_grid):
 
 @app.cell
 def _(ACCENT, NDSU_GOLD, NDSU_GREEN, drop_Xg, drop_x, drop_y, mo, mu, n_mc, np, p_drop, plt, torch, train_dropout_net, x_grid):
+    mo.stop(torch is None, mo.md("**Section 5 needs PyTorch**, which the browser-only (WebAssembly) playground does not have. Run the notebook locally or on molab to see dropout."))
     _p = p_drop.value
     _net = train_dropout_net(_p)
     _net.eval()
