@@ -1,6 +1,6 @@
 ---
 title: "Regularization"
-subtitle: "Week 9 · Session 17 · October 20, 2026"
+subtitle: "Week 10 · Session 19 · October 27, 2026"
 description: "Everything that narrows the gap between training and test performance: explicit penalties on the parameters and their Bayesian reading, the implicit regularization hidden inside gradient descent and SGD, and the heuristics that work in practice — early stopping, ensembling, dropout, noise, label smoothing, transfer learning, and data augmentation."
 categories: [training]
 
@@ -19,7 +19,7 @@ format:
 ::: {.lecture-meta}
 **Reading** Prince, *Understanding Deep Learning*, Chapter 9 (pp. 138–160) &nbsp;·&nbsp;
 **UDL notebooks** 9.1–9.5 &nbsp;·&nbsp;
-**Exam** Midterm on Chapters 1–7, in class Thursday, October 22
+**Next** Convolutional networks begin Thursday, October 29
 :::
 
 ::: {.callout-note appearance="simple"}

@@ -107,7 +107,7 @@ Blackboard is the authority on assignment deadlines.
 ### Midterm Exam (20%)
 
 An in-class, closed-book multiple-choice exam on **Thursday, October 22, 2026**,
-covering all topics through Chapter 9 (regularization). No laptop or computer is
+covering Chapters 1–7. No laptop or computer is
 required.
 
 ### Paper Presentation (20%)

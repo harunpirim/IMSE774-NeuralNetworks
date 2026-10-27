@@ -34,9 +34,9 @@ column below carries only the exam and project milestones.
 | 6 | Sep 29, Oct 1 | Fitting models | Ch. 6 | — |
 | 7 | Oct 6, 8 | Gradients & initialization | Ch. 7 | **Proposal** |
 | 8 | Oct 13, 15 | Measuring performance | Ch. 8 | — |
-| 9 | Oct 20, 22 | Regularization; **midterm Oct 22** | Ch. 9 | **Midterm** |
-| 10 | Oct 27, 29 | Convolutional networks; residual networks | Ch. 10–11 | — |
-| 11 | Nov 3, 5 | Transformers | Ch. 12 | **Paper choice** |
+| 9 | Oct 20, 22 | Midterm review; **midterm Oct 22** | Ch. 1–7 | **Midterm** |
+| 10 | Oct 27, 29 | Regularization; convolutional networks | Ch. 9–10 | — |
+| 11 | Nov 3, 5 | Residual networks; transformers | Ch. 11–12 | **Paper choice** |
 | 12 | Nov 10, 12 | Large language models | Ch. 12 + notes | **Progress** |
 | 13 | Nov 17, 19 | Graph neural networks | Ch. 13 | — |
 | 14 | Nov 24 | VAEs & GANs *(no class Nov 26)* | Ch. 15, 17 | — |
@@ -74,23 +74,24 @@ column below carries only the exam and project milestones.
 | Thu, Oct 8 | 14 | Vanishing/exploding gradients; He and Glorot initialization |
 | Tue, Oct 13 | 15 | Training, validation, and test error; the bias–variance trade-off |
 | Thu, Oct 15 | 16 | Double descent; hyperparameter search; midterm review |
-| Tue, Oct 20 | 17 | Explicit and implicit regularization; dropout, early stopping |
+| Tue, Oct 20 | 17 | Midterm review |
+| Thu, Oct 22 | 18 | **Midterm exam** |
+| Tue, Oct 27 | 19 | Regularization: explicit and implicit; early stopping, ensembles, dropout, noise, transfer learning |
 
 : {tbl-colwidths="[22,8,70]"}
 
 ::: {.callout-important}
 ## Midterm Exam — Thursday, October 22
-In class, multiple-choice, closed book, covering Chapters 1–9.
+In class, multiple-choice, closed book, covering Chapters 1–7.
 :::
 
 ### Part III — Architectures
 
 | Date | Session | Topic |
 |:-------------|:--:|:-----------------------------------------------------|
-| Tue, Oct 27 | 19 | Convolution, pooling, and image classification |
-| Thu, Oct 29 | 20 | Residual connections, batch norm, and modern CNNs |
-| Tue, Nov 3 | 21 | Self-attention and the transformer block |
-| Thu, Nov 5 | 22 | Positional encoding; encoder, decoder, and encoder–decoder models |
+| Thu, Oct 29 | 20 | Convolution, pooling, and image classification |
+| Tue, Nov 3 | 21 | Residual connections, batch norm, and modern CNNs |
+| Thu, Nov 5 | 22 | Self-attention and the transformer block; positional encoding; encoder, decoder, and encoder–decoder models |
 | Tue, Nov 10 | 23 | Pretraining, fine-tuning, and scaling laws |
 | Thu, Nov 12 | 24 | Tokenization, RoPE, KV caching, and inference efficiency |
 | Tue, Nov 17 | 25 | Graph representation; permutation equivariance |

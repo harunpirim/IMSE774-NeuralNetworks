@@ -1,6 +1,6 @@
 ---
 title: "Convolutional Networks"
-subtitle: "Week 10 · October 27 & 29, 2026"
+subtitle: "Weeks 10–11 · Sessions 20–21 · October 29 & November 3, 2026"
 description: "Convolution, pooling, residual connections, batch normalization, and modern image models."
 categories: [architectures]
 ---
