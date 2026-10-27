@@ -50,6 +50,7 @@ here. All of it — every cell, in the order the note uses it — is in a notebo
 you can open in the browser with nothing to install:
 
 - **[▶ Open the Week 9 notebook in Google Colab](https://colab.research.google.com/github/harunpirim/IMSE774-NeuralNetworks/blob/main/notebooks/week09-regularization.ipynb)** — all of this page's code, in order.
+- **[▶ Open the live demo in molab](https://molab.marimo.io/github/harunpirim/IMSE774-NeuralNetworks/blob/main/notebooks/week09-regularization-live.py)** — the in-class marimo notebook: every idea on this page behind a slider, with the chapter's problems worked. A [browser-only version](https://marimo.app/github.com/harunpirim/IMSE774-NeuralNetworks/blob/main/notebooks/week09-regularization-live.py) runs without a server but skips the dropout section.
 - **[▶ UDL notebook 9.1 — L2 regularization](https://colab.research.google.com/github/udlbook/udlbook/blob/main/Notebooks/Chap09/9_1_L2_Regularization.ipynb)** — the sweep of @fig-udl-9-2 on the simplified network.
 - **[▶ UDL notebook 9.2 — Implicit regularization](https://colab.research.google.com/github/udlbook/udlbook/blob/main/Notebooks/Chap09/9_2_Implicit_Regularization.ipynb)** — the discrete and continuous paths of @fig-udl-9-3.
 - **[▶ UDL notebook 9.3 — Ensembling](https://colab.research.google.com/github/udlbook/udlbook/blob/main/Notebooks/Chap09/9_3_Ensembling.ipynb)** — bagging as in @fig-udl-9-7.
