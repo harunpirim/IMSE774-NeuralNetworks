@@ -280,10 +280,12 @@ def _(mo):
 
     **What to look for.** *Left:* the two SGD curves lie exactly on top of each other.
     *Right:* with Adam, "L2 in the loss" and "decay the weights" are **different
-    algorithms**: Adam divides every gradient coordinate, including the $2\lambda w_j$
-    term, by its own running scale, so the penalty is blunted on the weights with
-    large gradients. Decaying the weights directly (**AdamW**) restores the intended
-    shrinkage. Raise $\lambda$ to see the gap open.
+    algorithms**: Adam divides each gradient coordinate, including its $2\lambda w_j$
+    term, by that coordinate's own running scale, so the effective decay varies from
+    weight to weight — blunted where the data gradients are large, amplified where
+    they are small — and the two curves no longer agree. **AdamW** decays every weight
+    by the same factor, which is what the penalty was meant to do. Raise $\lambda$ to
+    see the gap change.
     """)
     return
 
