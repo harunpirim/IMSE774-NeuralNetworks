@@ -52,6 +52,7 @@ MIT Press, 2024.
 - **[Syllabus](syllabus.qmd)** — grading, policies, and key dates
 - **[Schedule](schedule.qmd)** — week-by-week topics and readings
 - **[Lecture notes](notes/01-introduction.qmd)** — one page per topic, with runnable code and a Colab notebook
+- **[Research agents](research-agents.qmd)** — a project template where AI agents code your research in PyTorch and PyG while you make the decisions
 - **[Course flyer](flyer/flyer.pdf)** — one page to print, post, or forward to a colleague
 
 ## What This Course Covers
