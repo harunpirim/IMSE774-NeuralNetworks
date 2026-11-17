@@ -53,6 +53,7 @@ order the note uses it — is in a notebook you can open in the browser with
 nothing to install:
 
 - **[▶ Open the Week 10 notebook in Google Colab](https://colab.research.google.com/github/harunpirim/IMSE774-NeuralNetworks/blob/main/notebooks/week10-convolutional-networks.ipynb)** — all of this page's code, in order.
+- **[▶ Open the residual networks live demo in molab](https://molab.marimo.io/github/harunpirim/IMSE774-NeuralNetworks/blob/main/notebooks/week10-residual-networks-live.py)** — the in-class marimo notebook for the Chapter 11 half of this page: shattered gradients, residual blocks, exploding activations, BatchNorm, and a plain-versus-residual training run, each behind a slider, with the chapter's problems worked.
 - **[▶ UDL notebook 10.1 — 1D convolution](https://colab.research.google.com/github/udlbook/udlbook/blob/main/Notebooks/Chap10/10_1_1D_Convolution.ipynb)** — build the weight matrices of @fig-udl-10-4 by hand.
 - **[▶ UDL notebook 10.2 — Convolution for MNIST-1D](https://colab.research.google.com/github/udlbook/udlbook/blob/main/Notebooks/Chap10/10_2_Convolution_for_MNIST_1D.ipynb)** — the experiment of @fig-udl-10-8.
 - **[▶ UDL notebook 10.3 — 2D convolution](https://colab.research.google.com/github/udlbook/udlbook/blob/main/Notebooks/Chap10/10_3_2D_Convolution.ipynb)** — @fig-udl-10-9 and @fig-udl-10-10 in code.
