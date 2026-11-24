@@ -1,10 +1,10 @@
 ---
 title: "Attention and Transformers"
-subtitle: "Week 11 · Session 22 · November 5, 2026"
+subtitle: "Week 14 · Session 27 · November 24, 2026"
 description: "From word embeddings to attention to the transformer: query, key and value, self-attention and multi-head attention, skip connections, layer normalization and positional encoding, the encoder and decoder blocks, masking, and the two families built from those blocks, BERT and GPT-2."
 categories: [architectures]
 
-# As in Week 10, most of the code that produces the figures and printed results
+# As in the convolutional networks note, most of the code that produces the figures and printed results
 # is not shown on the page. It lives in the Colab notebook linked at the top of
 # the note, generated from this file by scripts/qmd_to_notebook.py, and it still
 # runs here so the figures and numbers stay in step with the prose. The two
@@ -21,7 +21,7 @@ format:
 ::: {.lecture-meta}
 **Reading** Glassner, *Deep Learning: A Visual Approach*, Chapter 20 (pp. 565–599) &nbsp;·&nbsp;
 **Also** Prince, *Understanding Deep Learning*, Chapter 12 (pp. 207–239) &nbsp;·&nbsp;
-**Due** Presentation paper selection, Thursday, November 5
+**No class** Thursday, November 26 (Thanksgiving)
 :::
 
 ::: {.callout-note appearance="simple"}
@@ -56,7 +56,7 @@ By the end of this session you should be able to:
 ## Two companions to this page
 
 - **[▶ From CNNs to Transformers — the interactive walkthrough](https://harunpirim.github.io/IMSE774-NeuralNetworks/interactive/from-cnns-to-transformers.html)** — eleven timed steps with live figures: drag a query against four keys, step through self-attention on a nine-word sentence with every number shown, shuffle the sentence to watch word order disappear, and switch a causal mask on and off. It runs in the browser with nothing to install.
-- **[▶ Open the Week 11 notebook in Google Colab](https://colab.research.google.com/github/harunpirim/IMSE774-NeuralNetworks/blob/main/notebooks/week11-transformers.ipynb)** — every code cell behind this page, in order.
+- **[▶ Open this week's notebook in Google Colab](https://colab.research.google.com/github/harunpirim/IMSE774-NeuralNetworks/blob/main/notebooks/week11-transformers.ipynb)** — every code cell behind this page, in order.
 
 Colab gives you a Python environment with NumPy, matplotlib, and PyTorch
 already installed. In Colab, run a cell with **Shift+Enter**.
@@ -547,7 +547,7 @@ assembling one.
 
 *Glassner, "Skip Connections", pp. 582–583; figure on p. 582. Prince §11.2, pp. 189–192.*
 
-You met these in Week 10 as
+You met these with residual networks as
 [residual connections](10-convolutional-networks.qmd#residual-connections-and-residual-blocks).
 Glassner's analogy is a finished portrait whose subject wishes they had worn a
 different ring. You could repaint the whole canvas, or you could paint the new
@@ -576,7 +576,7 @@ $$
 $$ {#eq-layernorm}
 
 It keeps the values flowing through the network from growing or shrinking. It
-is the cousin of the batch normalization of Week 10, with one difference that
+is the cousin of the batch normalization you met with residual networks, with one difference that
 matters here: the statistics come from one word vector, not from a batch, so
 the operation behaves the same for any batch size and any sentence length.
 
@@ -698,7 +698,7 @@ heads. The second is a **pointwise feed-forward layer**: two layers applied to
 every word separately, the first widening each vector to 2,048 numbers with a
 ReLU and the second bringing it back to 512 with no activation. Glassner
 suggests thinking of them as two 1×1 convolutions, the operation you used in
-Week 10 to change the number of channels at every pixel.
+convolutional networks to change the number of channels at every pixel.
 
 ![The encoder block: multi-head self-attention (the cube, eight heads) and two 1×1 convolutions, each part closed by a norm-add. Glassner (2021), figure 20-22, p. 587.](images/glassner-ch20/fig-20-22-encoder-block.png){#fig-dlva-20-22 width=78%}
 
@@ -995,8 +995,9 @@ near human performance [@hendrycks2021]. They produce words according to the
 probability that those words belong together. They have no common sense, no
 notion of accuracy or fairness, and they repeat whatever stereotypes and
 prejudices their training text contains (pp. 597–598). The chapter was written
-in 2021. The models have grown a great deal since, and Week 12 picks up the
-story; the cautions still apply.
+in 2021. The models have grown a great deal since, and the
+[Large Language Models](12-large-language-models.qmd) note picks up the story;
+the cautions still apply.
 
 ### Data poisoning
 
@@ -1030,8 +1031,8 @@ reliable method for certifying either yet existed when he wrote.
 - **BERT** is a stack of encoder blocks, trained to fill in blanks, and is fine-tuned for analysis tasks. **GPT-2** is a stack of decoder blocks without the Q/KV layer, trained to predict the next word, and generates text.
 - Generators reproduce the statistics of their training text, biases included, and can be compromised through that text by **data poisoning**.
 
-**Next:** Week 12 follows the decoder-only family to today's large language
-models: pretraining and fine-tuning at scale, tokenization, and what it takes
+**Next:** the [Large Language Models](12-large-language-models.qmd) note
+follows the decoder-only family to today's large language models: pretraining and fine-tuning at scale, tokenization, and what it takes
 to run them efficiently.
 
 ---
@@ -1088,7 +1089,7 @@ computation is needed, and what can be reused?
 
 **9. (UDL 12.6)** BERT was pretrained on two tasks: predicting masked words,
 and classifying whether two sentences were adjacent in the original text.
-Is each task generative or contrastive (Prince §9.3.6, Week 9)? Why might two tasks have
+Is each task generative or contrastive (Prince §9.3.6, in the Regularization note)? Why might two tasks have
 been used?
 
 **10. Computational.** In the tiny transformer, change the target from the

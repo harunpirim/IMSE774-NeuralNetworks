@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="A 75-minute, eleven-step interactive lesson that builds the transformer from convolutions, recurrence, soft lookup and residual blocks. IMSE 774, Week 11.">
-<!-- Supplement to the Week 11 note (notes/11-transformers.qmd). Plain HTML, CSS and JavaScript: no build step, no dependencies beyond two web fonts. -->
+<meta name="description" content="A 75-minute, eleven-step interactive lesson that builds the transformer from convolutions, recurrence, soft lookup and residual blocks. IMSE 774.">
+<!-- Supplement to the transformers note (notes/11-transformers.qmd). Plain HTML, CSS and JavaScript: no build step, no dependencies beyond two web fonts. -->
 <style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
 <title>From CNNs to Transformers</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
@@ -259,8 +259,8 @@ footer{padding-block:2rem 3rem;border-top:1px solid var(--rule);font-size:.9rem;
 
 <div class="wrap">
 <header class="hero">
-  <p class="eyebrow"><a href="../notes/11-transformers.html">← Week 11 lecture note</a> · <a href="../index.html">IMSE 774 home</a></p>
-  <p class="eyebrow"><b>IMSE 774</b> · Neural Networks · Week 11 · Glassner Ch. 20 · UDL Ch. 12</p>
+  <p class="eyebrow"><a href="../notes/11-transformers.html">← Lecture note for this session</a> · <a href="../index.html">IMSE 774 home</a></p>
+  <p class="eyebrow"><b>IMSE 774</b> · Neural Networks · Week 14 · Glassner Ch. 20 · UDL Ch. 12</p>
   <h1>From CNNs to Transformers</h1>
   <p class="lede">A transformer is assembled from parts you already know: shared weights from convolutions, a running summary from recurrent networks, residual connections and normalization from ResNets. One new part ties them together. Attention lets every token decide which other tokens to read. This page builds the model in eleven steps, timed for one 75-minute class.</p>
   <div class="clockrow">
@@ -270,7 +270,7 @@ footer{padding-block:2rem 3rem;border-top:1px solid var(--rule);font-size:.9rem;
     <span id="clockWhere" style="color:var(--ink-2)">A gold marker on the plan bar shows where the lecture should be.</span>
   </div>
   <p class="note"><b>Notation.</b> A sentence is <span class="m">N</span> tokens, each a vector of <span class="m">D</span> numbers. Here <span class="m">X</span> is <span class="m">N × D</span> with one token per row, as PyTorch stores it. Prince stores tokens as columns (<span class="m">D × N</span>), so his equations are the transposes of the ones on this page. Every figure with a control is live: the numbers are computed in your browser from the toy weights shown.</p>
-  <p class="note"><b>Where this fits.</b> The class reading is Glassner, <i>Deep Learning: A Visual Approach</i>, Chapter 20. This page is a supplement to it, and so is the <a href="https://harunpirim.github.io/IMSE774-NeuralNetworks/notes/11-transformers.html">Week 11 lecture note</a>, which follows the chapter section by section. Each step below names the pages it goes with.</p>
+  <p class="note"><b>Where this fits.</b> The class reading is Glassner, <i>Deep Learning: A Visual Approach</i>, Chapter 20. This page is a supplement to it, and so is the <a href="https://harunpirim.github.io/IMSE774-NeuralNetworks/notes/11-transformers.html">lecture note for this session</a>, which follows the chapter section by section. Each step below names the pages it goes with.</p>
 </header>
 </div>
 
@@ -297,13 +297,13 @@ footer{padding-block:2rem 3rem;border-top:1px solid var(--rule);font-size:.9rem;
     <figcaption>One word changes and the link that matters moves from “dog” to “ball”. This nine-token sentence is the running example for the whole page.</figcaption>
   </figure>
   <div class="prose">
-    <p>A fully connected layer fails the first two demands at once. With <span class="m">N</span> = 1,000 tokens and <span class="m">D</span> = 1,024 the input holds 1,024,000 numbers. One fully connected layer of the same width needs about 10<sup>12</sup> weights, and it only accepts sentences of exactly 1,000 tokens. You solved this problem for images in Week 10. Start there.</p>
+    <p>A fully connected layer fails the first two demands at once. With <span class="m">N</span> = 1,000 tokens and <span class="m">D</span> = 1,024 the input holds 1,024,000 numbers. One fully connected layer of the same width needs about 10<sup>12</sup> weights, and it only accepts sentences of exactly 1,000 tokens. You solved this problem for images with convolutional networks. Start there.</p>
   </div>
 </section>
 
 <section class="step" id="cnn" data-min="8" data-short="CNN">
   <div class="prose">
-    <p class="eyebrow"><span class="n">Step 2</span> · 8 min · from Week 10 · UDL §10.2</p>
+    <p class="eyebrow"><span class="n">Step 2</span> · 8 min · from the CNN sessions · UDL §10.2</p>
     <h2>Convolution: shared weights, short reach</h2>
     <p>A 1D convolution slides one small kernel along the sequence. The same weights are used at every position, so the layer works for any <span class="m">N</span>, and every position can be computed at the same time. Demands 1 and 2 are met. The trouble is reach: each output sees only <span class="m">k</span> neighbours.</p>
   </div>
@@ -355,7 +355,7 @@ footer{padding-block:2rem 3rem;border-top:1px solid var(--rule);font-size:.9rem;
     <p class="readout" id="rnnOut"></p>
   </div>
   <div class="prose">
-    <p>LSTM and GRU cells soften this with a gated additive path, <span class="m">c<sub>t</sub> = f<sub>t</sub> c<sub>t−1</sub> + i<sub>t</sub> g<sub>t</sub></span>. It is the same idea as the residual connection from Week 10: give the signal a route that is added, not multiplied through a nonlinearity. It helps, but the path between two words is still as long as the distance between them.</p>
+    <p>LSTM and GRU cells soften this with a gated additive path, <span class="m">c<sub>t</sub> = f<sub>t</sub> c<sub>t−1</sub> + i<sub>t</sub> g<sub>t</sub></span>. It is the same idea as the residual connection you met with ResNets: give the signal a route that is added, not multiplied through a nonlinearity. It helps, but the path between two words is still as long as the distance between them.</p>
   </div>
   <div class="kf">
     <div class="keep"><span class="tag">Keep</span><p>Every token can, in principle, use everything before it. Weights are shared over time.</p></div>
@@ -562,9 +562,9 @@ class SelfAttention(nn.Module):
     <figcaption>One block maps N × D to N × D, so blocks stack. Only the attention sublayer moves information between tokens. This is the layout in Prince and in the 2017 paper; most current models put each LayerNorm before its sublayer instead, which trains more stably when the stack is deep.</figcaption>
   </figure>
   <dl class="parts">
-    <div><dt><span class="src">Week 10 · ResNets</span>Residual connections</dt><dd>Each sublayer computes a correction that is added to its input. The token keeps its own identity, and gradients have a short path through the stack.</dd></div>
-    <div><dt><span class="src">Weeks 3–4 · shallow networks</span>The MLP</dt><dd>A one-hidden-layer network applied to every token separately with the same weights. It is a 1×1 convolution over the sequence, and it supplies the nonlinearity. With hidden width 4D it holds 8D² weights against 4D² in attention: two thirds of the block.</dd></div>
-    <div><dt><span class="src">Week 10 · BatchNorm’s cousin</span>Layer normalization</dt><dd>Each token’s D numbers are shifted and scaled to zero mean and unit variance. No statistic crosses tokens or examples, so it behaves the same for any batch size or sentence length.</dd></div>
+    <div><dt><span class="src">From ResNets</span>Residual connections</dt><dd>Each sublayer computes a correction that is added to its input. The token keeps its own identity, and gradients have a short path through the stack.</dd></div>
+    <div><dt><span class="src">From shallow networks</span>The MLP</dt><dd>A one-hidden-layer network applied to every token separately with the same weights. It is a 1×1 convolution over the sequence, and it supplies the nonlinearity. With hidden width 4D it holds 8D² weights against 4D² in attention: two thirds of the block.</dd></div>
+    <div><dt><span class="src">BatchNorm’s cousin</span>Layer normalization</dt><dd>Each token’s D numbers are shifted and scaled to zero mean and unit variance. No statistic crosses tokens or examples, so it behaves the same for any batch size or sentence length.</dd></div>
     <div><dt><span class="src">Step 7</span>Position, once</dt><dd>The positional encoding is added to X before the first block. The residual path carries it upward to every later block.</dd></div>
   </dl>
   <div class="lab">
@@ -655,7 +655,7 @@ class SelfAttention(nn.Module):
     <h3>Read next</h3>
     <ul>
       <li>Glassner, <i>Deep Learning: A Visual Approach</i>, Chapter 20: the reading this page supplements.</li>
-      <li>The <a href="https://harunpirim.github.io/IMSE774-NeuralNetworks/notes/11-transformers.html">Week 11 lecture note</a>, which follows that chapter with figures and runnable code.</li>
+      <li>The <a href="https://harunpirim.github.io/IMSE774-NeuralNetworks/notes/11-transformers.html">lecture note for this session</a>, which follows that chapter with figures and runnable code.</li>
       <li>Prince, <a href="https://udlbook.github.io/udlbook/"><i>Understanding Deep Learning</i></a>, Chapter 12.</li>
       <li>Vaswani et al., <a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a> (2017).</li>
       <li>Bahdanau, Cho and Bengio, <a href="https://arxiv.org/abs/1409.0473">Neural Machine Translation by Jointly Learning to Align and Translate</a> (2015).</li>
