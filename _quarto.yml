@@ -12,6 +12,8 @@ project:
     - flyer/flyer.pdf
     # Built from exams/ (gitignored) and copied here once released to students.
     - notes/files/*.pdf
+    # Self-contained interactive pages (plain HTML and JavaScript, no build step).
+    - interactive/*.html
 
 website:
   title: "IMSE 774 · Neural Networks"

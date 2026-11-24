@@ -1,0 +1,963 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="A 75-minute, eleven-step interactive lesson that builds the transformer from convolutions, recurrence, soft lookup and residual blocks. IMSE 774, Week 11.">
+<!-- Supplement to the Week 11 note (notes/11-transformers.qmd). Plain HTML, CSS and JavaScript: no build step, no dependencies beyond two web fonts. -->
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>From CNNs to Transformers</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column on the course's green-and-gold system; a sticky 75-minute plan bar on top;
+   each step is prose (68ch) followed by a full-width live "lab" panel. Query / key / value keep one color each. */
+:root{
+  --bg:#fbfcfb; --surface:#f2f5f3; --surface-2:#e4eae6; --cell:#eef2ef;
+  --ink:#17211d; --ink-2:#44524c; --ink-3:#6b7a73; --rule:#d5ddd8;
+  --brand:#005643; --on-brand:#ffffff; --gold:#ffc72c;
+  --q:#0b7a5e; --k:#b7791f; --v:#4c5fd5;
+  --seq:#0b6b53; --on-seq:#ffffff; --neg:#b4532a; --on-neg:#ffffff;
+  --font-body:"Source Sans 3","Source Sans Pro",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --font-mono:"JetBrains Mono","SF Mono",Menlo,Consolas,monospace;
+  --font-math:"STIX Two Math","Cambria Math","Latin Modern Math",Georgia,serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#101714; --surface:#18211d; --surface-2:#24302b; --cell:#1d2823;
+  --ink:#e6ece9; --ink-2:#b3c0ba; --ink-3:#8a9891; --rule:#2e3a35;
+  --brand:#5fc7a8; --on-brand:#06231b; --gold:#ffc72c;
+  --q:#2a9d80; --k:#c08a1e; --v:#7480e8;
+  --seq:#35b594; --on-seq:#06231b; --neg:#e0875c; --on-neg:#2a0f04; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#101714; --surface:#18211d; --surface-2:#24302b; --cell:#1d2823;
+  --ink:#e6ece9; --ink-2:#b3c0ba; --ink-3:#8a9891; --rule:#2e3a35;
+  --brand:#5fc7a8; --on-brand:#06231b; --gold:#ffc72c;
+  --q:#2a9d80; --k:#c08a1e; --v:#7480e8;
+  --seq:#35b594; --on-seq:#06231b; --neg:#e0875c; --on-neg:#2a0f04; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:17px;line-height:1.6}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+.wrap{max-width:54rem;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+a{color:var(--brand)}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+h1,h2,h3,h4{font-weight:600;letter-spacing:-.01em;text-wrap:balance;line-height:1.2;margin:0}
+h1{font-size:clamp(2rem,6vw,3rem);font-weight:700}
+h2{font-size:clamp(1.45rem,4vw,1.8rem)}
+h3{font-size:1.12rem}
+p,ul,ol,dl{margin:0}
+.prose{display:flex;flex-direction:column;gap:.9rem}
+.prose>p,.prose>ul,.prose>ol,.prose>h3{max-width:68ch}
+.prose ul,.prose ol{padding-left:1.25rem;display:flex;flex-direction:column;gap:.35rem}
+code,.mono{font-family:var(--font-mono);font-size:.86em}
+.m{font-family:var(--font-math);font-style:italic;white-space:nowrap;margin-right:.12em}
+.nt{text-transform:none;font-family:var(--font-math);font-style:italic;font-size:1.25em;letter-spacing:0}
+.m sub,.m sup{font-style:normal;font-size:.72em}
+math{font-size:1.15em}
+.eq{overflow-x:auto;padding:.4rem 0}
+.cq{color:var(--q);font-weight:700}.ck{color:var(--k);font-weight:700}.cv{color:var(--v);font-weight:700}
+
+/* hero */
+header.hero{padding-block:2.5rem 1.75rem;display:flex;flex-direction:column;gap:1rem}
+.eyebrow{font:600 .78rem var(--font-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.eyebrow b{color:var(--brand)}
+.hero h1::after{content:"";display:block;width:4.5rem;height:5px;background:var(--gold);margin-top:.9rem}
+.lede{font-size:1.15rem;max-width:62ch;color:var(--ink-2)}
+.clockrow{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem 1rem;font-size:.95rem}
+.clockrow output{font:600 1rem var(--font-mono);font-variant-numeric:tabular-nums}
+.note{font-size:.93rem;color:var(--ink-2);border-left:4px solid var(--gold);padding:.1rem 0 .1rem .8rem;max-width:68ch}
+
+/* buttons, controls */
+button{font:600 .9rem var(--font-body);color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:6px;padding:.38rem .8rem;cursor:pointer}
+button:hover{border-color:var(--ink-3)}
+button.primary{background:var(--brand);color:var(--on-brand);border-color:var(--brand)}
+.seg{display:inline-flex;flex-wrap:wrap;gap:0;border:1px solid var(--rule);border-radius:6px;overflow:hidden;background:var(--bg)}
+.seg button{border:0;border-radius:0;border-right:1px solid var(--rule)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--brand);color:var(--on-brand)}
+.controls{display:flex;flex-wrap:wrap;gap:.8rem 1.5rem;align-items:flex-end}
+.ctl{display:flex;flex-direction:column;gap:.25rem;min-width:0}
+.ctl-l{font:600 .72rem var(--font-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+.ctl output{font:600 .9rem var(--font-mono);font-variant-numeric:tabular-nums}
+.ctl .row{display:flex;align-items:center;gap:.6rem}
+input[type=range]{accent-color:var(--brand);width:11rem;max-width:100%}
+select{font:inherit;padding:.25rem .4rem;border:1px solid var(--rule);border-radius:6px;background:var(--bg);color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:.3rem}
+.chips button,.tok{font:500 .84rem var(--font-mono);padding:.2rem .5rem;border-radius:5px}
+.chips button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+/* plan bar */
+nav.plan{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--rule)}
+.plan .wrap{display:flex;align-items:center;gap:.8rem;padding-block:.45rem}
+.segs{list-style:none;margin:0;padding:0;display:flex;gap:2px;flex:1;min-width:0;position:relative}
+.segs li{flex:var(--min) 1 0;min-width:0}
+.segs a{display:flex;flex-direction:column;align-items:center;padding:.22rem 0;background:var(--surface-2);color:var(--ink-2);text-decoration:none;font:600 .7rem var(--font-mono);border-radius:3px;overflow:hidden;white-space:nowrap}
+.segs a .lbl{font:400 .68rem var(--font-body);display:none}
+.segs a[aria-current="true"]{background:var(--brand);color:var(--on-brand)}
+.segs .now{position:absolute;top:-3px;bottom:-3px;width:3px;background:var(--gold);box-shadow:0 0 0 1px var(--ink);border-radius:2px;transform:translateX(-50%)}
+.plan output{font:600 .8rem var(--font-mono);font-variant-numeric:tabular-nums;color:var(--ink-2);display:none}
+@media (min-width:760px){ .segs a .lbl{display:block} .plan output{display:block} }
+
+/* steps */
+section.step{padding-block:2.75rem;border-top:1px solid var(--rule);display:flex;flex-direction:column;gap:1.25rem;scroll-margin-top:3.6rem}
+.step .eyebrow .n{color:var(--brand)}
+.kf{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:.6rem 2rem;max-width:68ch}
+.kf div{display:flex;flex-direction:column;gap:.15rem;min-width:0}
+.kf .tag{font:600 .72rem var(--font-mono);letter-spacing:.06em;text-transform:uppercase}
+.kf .keep .tag{color:var(--q)} .kf .fix .tag{color:var(--neg)}
+.kf p{font-size:.97rem}
+
+/* labs */
+.lab{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:1rem;display:flex;flex-direction:column;gap:1rem;min-width:0}
+.lab>h3{display:flex;flex-wrap:wrap;gap:.2rem .6rem;align-items:baseline}
+.lab>h3 small{font:400 .85rem var(--font-body);color:var(--ink-3)}
+.readout{font-size:.97rem;color:var(--ink-2);max-width:70ch}
+.readout b{color:var(--ink)}
+figure{margin:0;min-width:0}
+figcaption{font-size:.9rem;color:var(--ink-2);max-width:70ch}
+.scroll{overflow-x:auto}
+svg{max-width:100%;height:auto;display:block}
+.scroll svg.wide{min-width:620px}
+.t{font:600 13px var(--font-body);fill:var(--ink)} .t2{font:12px var(--font-mono);fill:var(--ink-2)}
+.f-ink{fill:var(--ink)}.f-mute{fill:var(--ink-3)}.f-faint{fill:var(--rule)}.f-surf{fill:var(--bg)}.f-brand{fill:var(--brand)}.f-q{fill:var(--q)}.f-k{fill:var(--k)}.f-v{fill:var(--v)}.f-none{fill:none}
+.s-ink{stroke:var(--ink)}.s-mute{stroke:var(--ink-3)}.s-brand{stroke:var(--brand)}.s-q{stroke:var(--q)}.s-k{stroke:var(--k)}.s-v{stroke:var(--v)}.s-rule{stroke:var(--rule)}
+
+/* sentence figure */
+.tokens{display:flex;flex-wrap:wrap;gap:.3rem;align-items:center}
+.tok{border:1px solid var(--rule);background:var(--bg)}
+.tok.a{border:2px solid var(--q);font-weight:600}
+.tok.b{border:2px solid var(--k);font-weight:600}
+.sent{display:flex;flex-direction:column;gap:.5rem}
+
+/* matrices */
+.mxrow{display:flex;flex-wrap:wrap;gap:1rem 1.5rem;align-items:flex-start}
+.mxfig{display:flex;flex-direction:column;gap:.3rem;max-width:100%}
+.mxfig figcaption{display:flex;gap:.5rem;align-items:baseline;font-size:.9rem;color:var(--ink)}
+.mxfig .shape{font:.72rem var(--font-mono);color:var(--ink-3)}
+table.mx{border-collapse:separate;border-spacing:2px;font:10.5px var(--font-mono);font-variant-numeric:tabular-nums}
+.mx th{font-weight:500;color:var(--ink-2);text-align:right;padding:0 .35rem 0 0;white-space:nowrap}
+.mx th.col{vertical-align:bottom;text-align:center;padding:0 0 .15rem}
+.mx th.col span{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap}
+.mx td{width:31px;min-width:31px;height:24px;text-align:center;border-radius:3px;color:var(--ink);background:var(--cell)}
+.mx td.strong{color:var(--on-seq)} .mx td.strongneg{color:var(--on-neg)}
+.mx td.masked{background:repeating-linear-gradient(135deg,var(--surface-2) 0 3px,transparent 3px 6px)}
+.mx tr.sel th{color:var(--ink);font-weight:700}
+.mx tr.sel td{box-shadow:inset 0 2px 0 var(--ink),inset 0 -2px 0 var(--ink)}
+.mx.compact td{width:22px;min-width:22px;height:22px}
+.card{border-top:1px solid var(--rule);padding-top:1rem;display:flex;flex-direction:column;gap:.7rem}
+.card h4{font-size:1.02rem;display:flex;gap:.55rem;align-items:baseline}
+.card h4 .n{font:600 .8rem var(--font-mono);background:var(--ink);color:var(--bg);border-radius:50%;width:1.5rem;height:1.5rem;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.card p{font-size:.97rem;max-width:72ch}
+details{font-size:.95rem}
+details summary{cursor:pointer;font-weight:600;color:var(--brand)}
+details>*:not(summary){margin-top:.6rem}
+.stepper{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center}
+
+/* bar lists */
+.blist{display:flex;flex-direction:column;gap:3px;min-width:15rem;flex:1;max-width:24rem}
+.blist .ttl{font-size:.9rem;margin-bottom:.2rem}
+.brow{display:grid;grid-template-columns:4.6rem 1fr 2.6rem;gap:.5rem;align-items:center;font:.78rem var(--font-mono);font-variant-numeric:tabular-nums}
+.brow .lab-t{text-align:right;color:var(--ink-2)}
+.btrack{height:12px;background:var(--cell);border-radius:0 4px 4px 0}
+.bfill{height:100%;background:var(--seq);border-radius:0 4px 4px 0;min-width:1px}
+.brow.top{font-weight:600} .brow.top .lab-t{color:var(--ink)}
+
+/* receptive field */
+.rf{display:flex;flex-direction:column;gap:3px}
+.rfrow{display:grid;grid-template-columns:4rem repeat(17,minmax(0,1fr));gap:3px;align-items:center}
+.rfrow .l{font:.68rem var(--font-mono);color:var(--ink-3)}
+.rfcell{height:20px;border-radius:3px;background:var(--surface-2)}
+.rfcell.on{background:var(--seq)}
+.rfcell.unit{outline:2px solid var(--ink);outline-offset:1px}
+
+/* log plot */
+.logplot{display:grid;grid-template-columns:2.4rem minmax(0,1fr);gap:.4rem}
+.logaxis{position:relative;height:176px;font:.68rem var(--font-mono);color:var(--ink-3)}
+.logaxis span{position:absolute;right:0;transform:translateY(-50%)}
+.logbars{position:relative;height:176px;display:flex;gap:2px;border-left:1px solid var(--rule)}
+.logbars::before{content:"";position:absolute;left:0;right:0;top:72px;border-top:1px solid var(--ink-3)}
+.logbars .colm{flex:1;position:relative;min-width:0}
+.logbars .bar{position:absolute;left:0;right:0;background:var(--seq);min-height:2px}
+.logx{display:flex;gap:2px;margin-left:2.8rem;font:.66rem var(--font-mono);color:var(--ink-3)}
+.logx span{flex:1;text-align:center;min-width:0}
+
+/* lookup */
+.lk{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:1.25rem;align-items:center}
+@media (max-width:680px){.lk{grid-template-columns:minmax(0,1fr)}}
+#lkHandle{cursor:grab;touch-action:none}
+table.lkt{border-collapse:collapse;width:100%;font:.84rem var(--font-mono);font-variant-numeric:tabular-nums}
+.lkt th,.lkt td{padding:.3rem .4rem;text-align:right;border-bottom:1px solid var(--rule)}
+.lkt th{font:600 .7rem var(--font-mono);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3)}
+.lkt td:first-child,.lkt th:first-child{text-align:left}
+.lkt .w{width:40%}
+.lkt tfoot td{border-bottom:0;font-weight:600;font-size:.95rem}
+
+/* column bars */
+.cbars{display:flex;gap:2px;align-items:flex-end;height:110px;border-bottom:1px solid var(--ink-3)}
+.cbars div{flex:1;background:var(--seq);border-radius:4px 4px 0 0;min-height:1px;min-width:0}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:1.25rem}
+.two h4{font-size:.92rem;font-weight:600;margin-bottom:.4rem}
+.two .cap{font:.8rem var(--font-mono);color:var(--ink-2);margin-top:.35rem}
+
+/* shuffle cards */
+.shcards{display:flex;flex-wrap:wrap;gap:.5rem}
+.shcard{display:flex;flex-direction:column;gap:.2rem;font:.78rem var(--font-mono)}
+.shcard .vec{display:flex;gap:2px}
+.shcard .vec span{width:27px;height:20px;border-radius:3px;font-size:9.5px;display:flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums}
+.shcard .pos{color:var(--ink-3);font-size:.66rem}
+
+/* positional encoding */
+.pegrid{position:relative}
+.pecells{display:grid;grid-template-columns:repeat(32,minmax(0,1fr));gap:1px}
+.pecells div{height:9px}
+.pesel{position:absolute;top:-2px;bottom:-2px;border:2px solid var(--ink);border-radius:2px;pointer-events:none}
+.pebars{display:grid;grid-template-columns:repeat(32,minmax(0,1fr));gap:1px;height:64px;align-items:end;border-bottom:1px solid var(--ink-3)}
+.pebars div{background:var(--seq);border-radius:3px 3px 0 0;opacity:.45}
+.pebars div.peak{opacity:1}
+.axisnote{display:flex;justify-content:space-between;font:.68rem var(--font-mono);color:var(--ink-3)}
+
+/* norm grids */
+.norms{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:1.25rem}
+.ngrid{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;max-width:13rem}
+.ngrid div{height:18px;border-radius:3px;background:var(--surface-2)}
+.ngrid div.on{background:var(--k)}
+.norms figcaption{margin-top:.4rem}
+dl.parts{display:grid;grid-template-columns:repeat(auto-fit,minmax(17rem,1fr));gap:1rem 2rem}
+dl.parts dt{font-weight:600} dl.parts dd{margin:0;font-size:.97rem;color:var(--ink-2)}
+dl.parts .src{font:600 .7rem var(--font-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--k);display:block}
+
+/* tables and code */
+table.t{border-collapse:collapse;width:100%;font-size:.93rem;min-width:40rem}
+.t th,.t td{padding:.5rem .6rem;border-bottom:1px solid var(--rule);text-align:left;vertical-align:top}
+.t thead th{font:600 .72rem var(--font-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+.t tbody th{font-weight:600}
+.t td.hl,.t th.hl{background:var(--surface)}
+.codebox{position:relative}
+pre{margin:0;background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:1rem;overflow-x:auto;font:.82rem/1.55 var(--font-mono)}
+pre .c{color:var(--ink-3)}
+.codebox button{position:absolute;top:.5rem;right:.5rem;font-size:.75rem;padding:.2rem .55rem}
+.routes{display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:1rem}
+.routes figcaption b{color:var(--ink);display:block}
+.patches{display:flex;flex-wrap:wrap;align-items:center;gap:1rem}
+.pgrid{display:grid;grid-template-columns:repeat(4,22px);gap:2px}
+.pgrid span,.pseq span{width:22px;height:22px;border-radius:3px;background:var(--surface-2);font:9px var(--font-mono);display:flex;align-items:center;justify-content:center;color:var(--ink-2)}
+.pseq{display:flex;flex-wrap:wrap;gap:2px;max-width:100%}
+.pseq span.cls{background:var(--k);color:var(--bg);width:auto;padding:0 .3rem}
+.qs{display:flex;flex-direction:column;gap:.6rem;max-width:68ch}
+.qs details{border-bottom:1px solid var(--rule);padding-bottom:.6rem}
+.qs summary{color:var(--ink);font-weight:600}
+footer{padding-block:2rem 3rem;border-top:1px solid var(--rule);font-size:.9rem;color:var(--ink-3)}
+@media (prefers-reduced-motion:no-preference){.bfill,.cbars div,.logbars .bar,.pebars div{transition:all .18s ease}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="ah-mute" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="f-mute"/></marker>
+  <marker id="ah-brand" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="f-brand"/></marker>
+  <marker id="ah-q" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="f-q"/></marker>
+  <marker id="ah-k" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="f-k"/></marker>
+</defs></svg>
+
+<div class="wrap">
+<header class="hero">
+  <p class="eyebrow"><a href="../notes/11-transformers.html">← Week 11 lecture note</a> · <a href="../index.html">IMSE 774 home</a></p>
+  <p class="eyebrow"><b>IMSE 774</b> · Neural Networks · Week 11 · Glassner Ch. 20 · UDL Ch. 12</p>
+  <h1>From CNNs to Transformers</h1>
+  <p class="lede">A transformer is assembled from parts you already know: shared weights from convolutions, a running summary from recurrent networks, residual connections and normalization from ResNets. One new part ties them together. Attention lets every token decide which other tokens to read. This page builds the model in eleven steps, timed for one 75-minute class.</p>
+  <div class="clockrow">
+    <button id="clockBtn" class="primary" type="button">Start lecture clock</button>
+    <button id="clockReset" type="button">Reset</button>
+    <output id="clockOut" for="clockBtn">0:00 / 75:00</output>
+    <span id="clockWhere" style="color:var(--ink-2)">A gold marker on the plan bar shows where the lecture should be.</span>
+  </div>
+  <p class="note"><b>Notation.</b> A sentence is <span class="m">N</span> tokens, each a vector of <span class="m">D</span> numbers. Here <span class="m">X</span> is <span class="m">N × D</span> with one token per row, as PyTorch stores it. Prince stores tokens as columns (<span class="m">D × N</span>), so his equations are the transposes of the ones on this page. Every figure with a control is live: the numbers are computed in your browser from the toy weights shown.</p>
+  <p class="note"><b>Where this fits.</b> The class reading is Glassner, <i>Deep Learning: A Visual Approach</i>, Chapter 20. This page is a supplement to it, and so is the <a href="https://harunpirim.github.io/IMSE774-NeuralNetworks/notes/11-transformers.html">Week 11 lecture note</a>, which follows the chapter section by section. Each step below names the pages it goes with.</p>
+</header>
+</div>
+
+<nav class="plan" aria-label="Lecture plan, 75 minutes">
+  <div class="wrap"><ol class="segs" id="segs"></ol><output id="planOut">0:00</output></div>
+</nav>
+
+<main class="wrap">
+
+<section class="step" id="sequences" data-min="5" data-short="Sequences">
+  <div class="prose">
+    <p class="eyebrow"><span class="n">Step 1</span> · 5 min · Glassner pp. 566–571 · UDL §12.1</p>
+    <h2>What a sentence asks of a network</h2>
+    <p>Text arrives as a sequence of tokens, and each token is looked up in a table to become a vector of <span class="m">D</span> numbers. The whole sentence is an <span class="m">N × D</span> matrix. Whatever layer we design has to meet three demands.</p>
+    <ol>
+      <li><b>Any length.</b> A sentence may have 5 tokens or 5,000. The number of parameters cannot depend on <span class="m">N</span>.</li>
+      <li><b>Shared weights.</b> “dog” means the same thing at position 2 and at position 200. The layer should not relearn it for each position.</li>
+      <li><b>Long-range links that depend on the words.</b> Read the two sentences below. Understanding “hungry” means connecting it to “dog”, six tokens back. Change one word to “round” and the connection has to move to “ball”.</li>
+    </ol>
+  </div>
+  <figure class="sent">
+    <p class="tokens"><span class="tok">the</span><span class="tok a">dog</span><span class="tok">ignored</span><span class="tok">the</span><span class="tok">ball</span><span class="tok">because</span><span class="tok">it</span><span class="tok">was</span><span class="tok a">hungry</span></p>
+    <p class="tokens"><span class="tok">the</span><span class="tok">dog</span><span class="tok">ignored</span><span class="tok">the</span><span class="tok b">ball</span><span class="tok">because</span><span class="tok">it</span><span class="tok">was</span><span class="tok b">round</span></p>
+    <figcaption>One word changes and the link that matters moves from “dog” to “ball”. This nine-token sentence is the running example for the whole page.</figcaption>
+  </figure>
+  <div class="prose">
+    <p>A fully connected layer fails the first two demands at once. With <span class="m">N</span> = 1,000 tokens and <span class="m">D</span> = 1,024 the input holds 1,024,000 numbers. One fully connected layer of the same width needs about 10<sup>12</sup> weights, and it only accepts sentences of exactly 1,000 tokens. You solved this problem for images in Week 10. Start there.</p>
+  </div>
+</section>
+
+<section class="step" id="cnn" data-min="8" data-short="CNN">
+  <div class="prose">
+    <p class="eyebrow"><span class="n">Step 2</span> · 8 min · from Week 10 · UDL §10.2</p>
+    <h2>Convolution: shared weights, short reach</h2>
+    <p>A 1D convolution slides one small kernel along the sequence. The same weights are used at every position, so the layer works for any <span class="m">N</span>, and every position can be computed at the same time. Demands 1 and 2 are met. The trouble is reach: each output sees only <span class="m">k</span> neighbours.</p>
+  </div>
+  <div class="lab" id="rfLab">
+    <h3>Receptive field of one unit <small>17 tokens, stride 1</small></h3>
+    <div class="controls">
+      <div class="ctl"><label class="ctl-l" for="rfK">Kernel size <span class="nt">k</span></label><select id="rfK"><option value="3">3</option><option value="5">5</option><option value="7">7</option></select></div>
+      <div class="ctl"><label class="ctl-l" for="rfL">Layers</label><div class="row"><input type="range" id="rfL" min="1" max="8" value="2"><output id="rfLo" for="rfL"></output></div></div>
+      <div class="ctl"><label class="ctl-l" for="rfP">Unit position</label><div class="row"><input type="range" id="rfP" min="1" max="17" value="9"><output id="rfPo" for="rfP"></output></div></div>
+    </div>
+    <div class="rf" id="rfGrid" role="img" aria-label="Cone of tokens that feed one unit in the top layer"></div>
+    <p class="readout" id="rfOut"></p>
+  </div>
+  <div class="kf">
+    <div class="keep"><span class="tag">Keep</span><p>One set of weights reused at every position. All positions computed in parallel.</p></div>
+    <div class="fix"><span class="tag">Fix</span><p>Distant words need many layers to meet. The kernel weights are frozen after training, so every sentence gets the same mixing pattern.</p></div>
+  </div>
+  <div class="prose">
+    <p>Hold on to one formula. A convolution output is a weighted sum of neighbours, <span class="m">h<sub>i</sub> = Σ<sub>j</sub> w<sub>j−i</sub> x<sub>j</sub></span>, where the weight depends only on the offset <span class="m">j − i</span>. Attention will keep the weighted sum and change where the weights come from.</p>
+  </div>
+</section>
+
+<section class="step" id="rnn" data-min="8" data-short="RNN">
+  <div class="prose">
+    <p class="eyebrow"><span class="n">Step 3</span> · 8 min · Glassner p. 565 and Ch. 19 · not in UDL</p>
+    <h2>Recurrence: unlimited reach, one step at a time</h2>
+    <p>A recurrent network reads the tokens in order and keeps a running summary, the hidden state: <span class="m">h<sub>t</sub> = tanh(W<sub>h</sub> h<sub>t−1</sub> + W<sub>x</sub> x<sub>t</sub>)</span>. The same two matrices are used at every step, so any length works, and in principle <span class="m">h<sub>t</sub></span> can remember anything that came before.</p>
+  </div>
+  <figure>
+    <div class="scroll"><svg class="wide" id="rnnSvg" viewBox="0 0 720 190" role="img" aria-label="An unrolled recurrent network: each hidden state is computed from the previous hidden state and the current token, with the same weights at every step"></svg></div>
+    <figcaption>The network unrolled over the sentence. Information from “dog” reaches “hungry” only by surviving every gold arrow in between.</figcaption>
+  </figure>
+  <div class="prose">
+    <p>Two costs follow from that chain. First, step <span class="m">t</span> must wait for step <span class="m">t − 1</span>, so the positions cannot be computed in parallel. Second, a signal passing through <span class="m">T</span> steps is multiplied <span class="m">T</span> times. In the simplest scalar model, <span class="m">h<sub>t</sub> = γ h<sub>t−1</sub> + x<sub>t</sub></span>, the gradient from step 20 back to step <span class="m">t</span> is exactly <span class="m">γ<sup>20−t</sup></span>.</p>
+  </div>
+  <div class="lab" id="rnnLab">
+    <h3>How much of each token survives to step 20 <small>scalar model, log scale</small></h3>
+    <div class="controls">
+      <div class="ctl"><label class="ctl-l" for="rnnG">Recurrent gain <span class="nt">γ</span></label><div class="row"><input type="range" id="rnnG" min="0.5" max="1.5" step="0.05" value="0.8"><output id="rnnGo" for="rnnG"></output></div></div>
+    </div>
+    <figure>
+      <div class="logplot">
+        <div class="logaxis" aria-hidden="true"><span style="top:24px">10³</span><span style="top:72px">1</span><span style="top:120px">10⁻³</span><span style="top:168px">10⁻⁶</span></div>
+        <div class="logbars" id="rnnBars"></div>
+      </div>
+      <div class="logx" id="rnnX" aria-hidden="true"></div>
+      <figcaption>Factor multiplying the gradient from step 20 back to step t. Bars below the line shrink the signal; bars above it blow it up.</figcaption>
+    </figure>
+    <p class="readout" id="rnnOut"></p>
+  </div>
+  <div class="prose">
+    <p>LSTM and GRU cells soften this with a gated additive path, <span class="m">c<sub>t</sub> = f<sub>t</sub> c<sub>t−1</sub> + i<sub>t</sub> g<sub>t</sub></span>. It is the same idea as the residual connection from Week 10: give the signal a route that is added, not multiplied through a nonlinearity. It helps, but the path between two words is still as long as the distance between them.</p>
+  </div>
+  <div class="kf">
+    <div class="keep"><span class="tag">Keep</span><p>Every token can, in principle, use everything before it. Weights are shared over time.</p></div>
+    <div class="fix"><span class="tag">Fix</span><p>The path between two tokens grows with their distance. Steps run one after another. The whole past is squeezed into one vector.</p></div>
+  </div>
+</section>
+
+<section class="step" id="lookup" data-min="8" data-short="Lookup">
+  <div class="prose">
+    <p class="eyebrow"><span class="n">Step 4</span> · 8 min · Glassner pp. 574–575</p>
+    <h2>Attention: look it up, don’t carry it</h2>
+    <p>Compare how the three designs move information from token 1 to token 9.</p>
+  </div>
+  <div class="routes">
+    <figure><svg id="rtConv" viewBox="0 0 240 130" role="img" aria-label="Convolution with kernel 3 needs 4 stacked layers before one unit sees both token 1 and token 9"></svg><figcaption><b>Convolution, k = 3</b>4 layers before one unit sees both.</figcaption></figure>
+    <figure><svg id="rtRnn" viewBox="0 0 240 130" role="img" aria-label="A recurrent network needs 8 sequential steps to carry token 1 to token 9"></svg><figcaption><b>Recurrence</b>8 steps, one after another.</figcaption></figure>
+    <figure><svg id="rtAtt" viewBox="0 0 240 130" role="img" aria-label="Attention connects token 9 to token 1 in a single step"></svg><figcaption><b>Attention</b>1 step, for any pair.</figcaption></figure>
+  </div>
+  <div class="prose">
+    <p>The idea came from translation. In 2014 an encoder RNN compressed the source sentence into one vector and a decoder RNN unpacked it. Bahdanau, Cho and Bengio kept all the encoder states instead. At each output word the decoder scores every encoder state against what it currently needs and takes a weighted average. In 2017 Vaswani and colleagues removed the recurrence and kept only that lookup.</p>
+    <p>Think of a Python dictionary. A <span class="cq">query</span> is compared with every <span class="ck">key</span>, and the <span class="cv">value</span> stored under the matching key is returned. Attention is the soft version: every key matches to a degree, measured by a dot product. A softmax turns the scores into weights, and the result is the weighted average of all the values.</p>
+    <p>Glassner tells the same story with a paint store. Your request is the query, the name on each can is a key, and the paint inside is the value: the better a name matches the request, the more of that paint goes into the mix.</p>
+  </div>
+  <div class="lab" id="lkLab">
+    <h3>Soft lookup with four keys <small>drag the query, or use the slider</small></h3>
+    <div class="lk">
+      <svg id="lkSvg" viewBox="-160 -160 320 320" role="img" aria-label="Four key vectors and one query vector in the plane"></svg>
+      <div style="display:flex;flex-direction:column;gap:.9rem;min-width:0">
+        <div class="controls">
+          <div class="ctl"><label class="ctl-l" for="lkA">Query direction</label><div class="row"><input type="range" id="lkA" min="0" max="359" value="45"><output id="lkAo" for="lkA"></output></div></div>
+          <div class="ctl"><label class="ctl-l" for="lkB">Sharpness <span class="nt">β</span></label><div class="row"><input type="range" id="lkB" min="0" max="12" step="0.5" value="4"><output id="lkBo" for="lkB"></output></div></div>
+        </div>
+        <div class="scroll"><table class="lkt" id="lkT"></table></div>
+      </div>
+    </div>
+    <p class="readout">Scores are <span class="m">β q·k</span>. At β = 0 every key gets the same weight and the output is the plain average, 25. At β = 12 the best match takes nearly everything, which is an ordinary dictionary. Raising β is the same as making the query vector longer.</p>
+  </div>
+</section>
+
+<section class="step" id="self-attention" data-min="14" data-short="Self-attention">
+  <div class="prose">
+    <p class="eyebrow"><span class="n">Step 5</span> · 14 min · Glassner pp. 576–579 · UDL §12.2</p>
+    <h2>Self-attention, computed by hand</h2>
+    <p>In self-attention the sentence looks itself up. Every token plays all three roles, through three linear maps of the same <span class="m">X</span>: a <span class="cq">query</span> (what am I looking for?), a <span class="ck">key</span> (what do I offer for matching?), and a <span class="cv">value</span> (what do I hand over if read?). Set it beside the convolution from Step 2:</p>
+    <ul>
+      <li>Convolution: <span class="m">h<sub>i</sub> = Σ<sub>j near i</sub> w<sub>j−i</sub> x<sub>j</sub></span>. Weights fixed by offset.</li>
+      <li>Self-attention: <span class="m">h<sub>i</sub> = Σ<sub>all j</sub> a(x<sub>i</sub>, x<sub>j</sub>) v<sub>j</sub></span>. Weights computed from the two tokens.</li>
+    </ul>
+    <p>Step through the computation on the running sentence. Pick a query token, then swap the last word and watch the weights move.</p>
+  </div>
+  <div class="lab" id="saLab">
+    <h3>Six steps on nine tokens <small>D = 4, weights set by hand</small></h3>
+    <div class="controls">
+      <div class="ctl"><span class="ctl-l" id="saLastL">Last word</span><div class="seg" id="saLast" role="group" aria-labelledby="saLastL"><button type="button" data-v="hungry">hungry</button><button type="button" data-v="round">round</button></div></div>
+      <div class="ctl"><span class="ctl-l" id="saTokL">Query token</span><div class="chips" id="saTok" role="group" aria-labelledby="saTokL"></div></div>
+    </div>
+    <div class="stepper">
+      <div class="seg" id="saSteps" role="group" aria-label="Show steps up to"></div>
+      <button type="button" id="saNext" class="primary">Next step</button>
+      <button type="button" id="saRestart">Restart at step 1</button>
+    </div>
+    <div id="saBody" style="display:flex;flex-direction:column;gap:1rem"></div>
+  </div>
+  <div class="prose">
+    <p>All six steps fit in one line:</p>
+    <div class="eq"><math display="block"><mrow><mi>Sa</mi><mo>[</mo><mi>X</mi><mo>]</mo><mo>=</mo><mi>softmax</mi><mo>(</mo><mfrac><mrow><mi>Q</mi><msup><mi>K</mi><mi>T</mi></msup></mrow><msqrt><mi>D</mi></msqrt></mfrac><mo>)</mo><mspace width="0.2em"/><mi>V</mi><mo>,</mo><mspace width="1em"/><mi>Q</mi><mo>=</mo><mi>X</mi><msub><mi>W</mi><mi>q</mi></msub><mo>,</mo><mspace width="0.5em"/><mi>K</mi><mo>=</mo><mi>X</mi><msub><mi>W</mi><mi>k</mi></msub><mo>,</mo><mspace width="0.5em"/><mi>V</mi><mo>=</mo><mi>X</mi><msub><mi>W</mi><mi>v</mi></msub></mrow></math></div>
+    <ul>
+      <li><b>Any length, shared weights.</b> The only parameters are <span class="m">W<sub>q</sub>, W<sub>k</sub>, W<sub>v</sub></span>, each <span class="m">D × D</span>. Nothing depends on <span class="m">N</span>.</li>
+      <li><b>One step between any two tokens</b>, and no loop over positions: three matrix products and a softmax.</li>
+      <li><b>The price.</b> The attention matrix is <span class="m">N × N</span>. Time and memory grow with the square of the sequence length.</li>
+    </ul>
+    <p><b>Try “it” as the query.</b> “dog” and “ball” receive exactly the same weight. One layer cannot decide, because the query of “it” is computed from “it” alone. In a second layer “it” can read from “hungry”, which by then carries “dog”. Stacking layers composes lookups, the same way stacking convolutions composed receptive fields.</p>
+    <h3>The same six steps in PyTorch</h3>
+  </div>
+  <div class="codebox"><button type="button" class="copy">Copy</button><pre><code>import math, torch, torch.nn as nn, torch.nn.functional as F
+
+class SelfAttention(nn.Module):
+    def __init__(self, D):
+        super().__init__()
+        self.q = nn.Linear(D, D, bias=False)
+        self.k = nn.Linear(D, D, bias=False)
+        self.v = nn.Linear(D, D, bias=False)
+
+    def forward(self, X):                          <span class="c"># X: (N, D)</span>
+        Q, K, V = self.q(X), self.k(X), self.v(X)  <span class="c"># step 2</span>
+        S = Q @ K.T / math.sqrt(X.shape[-1])       <span class="c"># steps 3-4: (N, N)</span>
+        A = F.softmax(S, dim=-1)                   <span class="c"># step 5: rows sum to 1</span>
+        return A @ V                               <span class="c"># step 6: (N, D)</span></code></pre></div>
+</section>
+
+<section class="step" id="scaling" data-min="4" data-short="√D">
+  <div class="prose">
+    <p class="eyebrow"><span class="n">Step 6</span> · 4 min · Glassner p. 577 · UDL §12.3.2</p>
+    <h2>Why divide by √D</h2>
+    <p>If the entries of a query and a key are independent with unit variance, their dot product is a sum of <span class="m">D</span> terms and has variance <span class="m">D</span>. At <span class="m">D</span> = 1,024 a typical score is around ±32. Softmax of numbers that large is nearly one-hot, and a one-hot softmax has almost zero gradient. Dividing by <span class="m">√D</span> brings the scores back to unit scale whatever the width.</p>
+  </div>
+  <div class="lab" id="sdLab">
+    <h3>One random query against eight random keys</h3>
+    <div class="controls">
+      <div class="ctl"><label class="ctl-l" for="sdD">Embedding size D</label><div class="row"><input type="range" id="sdD" min="0" max="4" value="3"><output id="sdDo" for="sdD"></output></div></div>
+    </div>
+    <div class="two">
+      <figure><h4>softmax(q·k), no scaling</h4><div class="cbars" id="sdU"></div><p class="cap" id="sdUc"></p></figure>
+      <figure><h4>softmax(q·k / √D)</h4><div class="cbars" id="sdS"></div><p class="cap" id="sdSc"></p></figure>
+    </div>
+    <p class="readout" id="sdOut"></p>
+  </div>
+</section>
+
+<section class="step" id="position" data-min="7" data-short="Position">
+  <div class="prose">
+    <p class="eyebrow"><span class="n">Step 7</span> · 7 min · Glassner pp. 584–585 · UDL §12.3.1</p>
+    <h2>Putting word order back</h2>
+    <p>Look again at the formula in Step 5. Nothing in it mentions position. Shuffle the rows of <span class="m">X</span> and the rows of the output are shuffled the same way, with every number unchanged. A convolution was equivariant to translation; self-attention is equivariant to every permutation. To this layer “dog ignored ball” and “ball ignored dog” are the same bag of words.</p>
+  </div>
+  <div class="lab" id="shLab">
+    <h3>Shuffle the sentence <small>each card shows a token and its output row</small></h3>
+    <div class="controls">
+      <button type="button" id="shBtn" class="primary">Shuffle the words</button>
+      <button type="button" id="shReset">Original order</button>
+      <label style="display:flex;gap:.45rem;align-items:center;font-size:.95rem"><input type="checkbox" id="shPE"> Add a positional encoding to X</label>
+    </div>
+    <div class="shcards" id="shCards"></div>
+    <p class="readout" id="shOut"></p>
+  </div>
+  <div class="prose">
+    <p>The fix is to tell each token where it is before the first layer: <span class="m">X ← X + P</span>, where row <span class="m">p</span> of <span class="m">P</span> encodes position <span class="m">p</span>. The original transformer used sinusoids at geometrically spaced frequencies:</p>
+    <div class="eq"><math display="block"><mrow><msub><mi>P</mi><mrow><mi>p</mi><mo>,</mo><mn>2</mn><mi>i</mi></mrow></msub><mo>=</mo><mi>sin</mi><mo>(</mo><mi>p</mi><mspace width="0.15em"/><msub><mi>ω</mi><mi>i</mi></msub><mo>)</mo><mo>,</mo><mspace width="1em"/><msub><mi>P</mi><mrow><mi>p</mi><mo>,</mo><mn>2</mn><mi>i</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><mi>cos</mi><mo>(</mo><mi>p</mi><mspace width="0.15em"/><msub><mi>ω</mi><mi>i</mi></msub><mo>)</mo><mo>,</mo><mspace width="1em"/><msub><mi>ω</mi><mi>i</mi></msub><mo>=</mo><msup><mn>10000</mn><mrow><mo>−</mo><mn>2</mn><mi>i</mi><mo>/</mo><mi>D</mi></mrow></msup></mrow></math></div>
+    <p>Each pair of dimensions is a clock hand turning at its own speed. Shifting by <span class="m">k</span> positions turns every hand by a fixed angle, so <span class="m">P<sub>p+k</sub></span> is a rotation of <span class="m">P<sub>p</sub></span>. A rotation is a linear map, so <span class="m">W<sub>q</sub></span> can learn it. That lets a head ask for “the token <span class="m">k</span> places away”.</p>
+  </div>
+  <div class="lab" id="peLab">
+    <h3>Sinusoidal encoding <small>32 positions, D = 16</small></h3>
+    <div class="controls">
+      <div class="ctl"><label class="ctl-l" for="peP">Query position <span class="nt">p</span></label><div class="row"><input type="range" id="peP" min="0" max="31" value="14"><output id="pePo" for="peP"></output></div></div>
+      <div class="ctl"><label class="ctl-l" for="peK">Rotate query by <span class="nt">k</span> positions</label><div class="row"><input type="range" id="peK" min="-6" max="6" value="0"><output id="peKo" for="peK"></output></div></div>
+    </div>
+    <figure>
+      <div class="pegrid"><div class="pecells" id="peCells"></div><div class="pesel" id="peSel"></div></div>
+      <div class="axisnote"><span>position 0</span><span>each column is one position; rows run from fast dimensions (top) to slow (bottom)</span><span>31</span></div>
+    </figure>
+    <figure>
+      <div class="pebars" id="peBars"></div>
+      <figcaption id="peOut"></figcaption>
+    </figure>
+  </div>
+  <div class="prose">
+    <p>Other choices exist. BERT and GPT-2 learn a table with one row per position. Recent language models rotate the queries and keys directly (RoPE), which you will meet in the language-model sessions.</p>
+  </div>
+</section>
+
+<section class="step" id="heads" data-min="5" data-short="Heads">
+  <div class="prose">
+    <p class="eyebrow"><span class="n">Step 8</span> · 5 min · Glassner pp. 580–581 · UDL §12.3.3</p>
+    <h2>Several heads, several questions</h2>
+    <p>One softmax row is one distribution, so with a single set of weights a token asks one question. Words relate in several ways at once: a verb wants its subject, its object, and the word just before it. Multi-head attention runs <span class="m">H</span> small attentions in parallel. Each head has its own <span class="m">W<sub>q</sub>, W<sub>k</sub>, W<sub>v</sub></span> of width <span class="m">D/H</span>. Their outputs are concatenated and mixed by one more matrix <span class="m">W<sub>o</sub></span>. The total cost is about the same as one full-width head.</p>
+  </div>
+  <figure>
+    <div class="scroll"><svg class="wide" viewBox="0 0 760 210" role="img" aria-label="Multi-head attention: X feeds two heads with separate weights, their outputs are concatenated and mixed by an output matrix">
+      <rect x="20" y="82" width="74" height="46" rx="6" class="f-surf s-ink" stroke-width="1.5"/><text x="57" y="102" text-anchor="middle" class="t">X</text><text x="57" y="119" text-anchor="middle" class="t2">N × D</text>
+      <path d="M94 98 L146 62" class="s-mute f-none" stroke-width="1.5" marker-end="url(#ah-mute)"/><path d="M94 112 L146 148" class="s-mute f-none" stroke-width="1.5" marker-end="url(#ah-mute)"/>
+      <rect x="150" y="30" width="290" height="60" rx="6" class="f-surf s-q" stroke-width="2"/><text x="166" y="54" class="t">Head 1: its own W_q, W_k, W_v</text><text x="166" y="74" class="t2">softmax(Q₁K₁ᵀ / √D_h) V₁</text>
+      <rect x="150" y="120" width="290" height="60" rx="6" class="f-surf s-q" stroke-width="2"/><text x="166" y="144" class="t">Head 2: its own W_q, W_k, W_v</text><text x="166" y="164" class="t2">softmax(Q₂K₂ᵀ / √D_h) V₂</text>
+      <path d="M440 60 L496 92" class="s-mute f-none" stroke-width="1.5" marker-end="url(#ah-mute)"/><path d="M440 150 L496 118" class="s-mute f-none" stroke-width="1.5" marker-end="url(#ah-mute)"/>
+      <text x="472" y="58" text-anchor="middle" class="t2">N × D/2</text><text x="472" y="166" text-anchor="middle" class="t2">N × D/2</text>
+      <rect x="500" y="82" width="86" height="46" rx="6" class="f-surf s-ink" stroke-width="1.5"/><text x="543" y="102" text-anchor="middle" class="t">concat</text><text x="543" y="119" text-anchor="middle" class="t2">N × D</text>
+      <path d="M586 105 H622" class="s-mute f-none" stroke-width="1.5" marker-end="url(#ah-mute)"/>
+      <rect x="626" y="82" width="56" height="46" rx="6" class="f-surf s-ink" stroke-width="1.5"/><text x="654" y="110" text-anchor="middle" class="t">W_o</text>
+      <path d="M682 105 H738" class="s-mute f-none" stroke-width="1.5" marker-end="url(#ah-mute)"/><text x="712" y="96" text-anchor="middle" class="t2">N × D</text>
+    </svg></div>
+    <figcaption>Two heads shown; the original transformer used H = 8 with D = 512, BERT-base uses H = 12 with D = 768.</figcaption>
+  </figure>
+  <div class="lab" id="hdLab">
+    <h3>Two heads on the same sentence <small>rows are queries, columns are the tokens read</small></h3>
+    <div class="mxrow" id="hdBody"></div>
+    <p class="readout">Head A is the content head from Step 5. Head B ignores the words: its <span class="m">W<sub>q</sub></span> rotates each position encoding one place back, so every token reads the token before it. Head B is one tap of a convolution kernel. With <span class="m">k</span> such heads at <span class="m">k</span> offsets, an attention layer can reproduce a size-<span class="m">k</span> convolution (Cordonnier et al., 2020). Convolution is a special case the model can learn when the data call for it.</p>
+  </div>
+</section>
+
+<section class="step" id="block" data-min="7" data-short="Block">
+  <div class="prose">
+    <p class="eyebrow"><span class="n">Step 9</span> · 7 min · Glassner pp. 582–587 · UDL §12.4</p>
+    <h2>The transformer block</h2>
+    <p>Attention alone is a weighted average: almost linear, and in Step 5 “hungry” came out mostly as “dog”, having lost itself. The block wraps attention in three parts you have used before.</p>
+  </div>
+  <figure>
+    <div class="scroll"><svg class="wide" viewBox="0 0 780 190" role="img" aria-label="Transformer block: multi-head self-attention with a residual connection, layer normalization, a per-token MLP with a residual connection, and a second layer normalization">
+      <text x="18" y="125" class="t">X</text><path d="M34 120 H96" class="s-mute f-none" stroke-width="1.5" marker-end="url(#ah-mute)"/>
+      <rect x="100" y="94" width="150" height="52" rx="6" class="f-surf s-q" stroke-width="2"/><text x="175" y="116" text-anchor="middle" class="t">Multi-head</text><text x="175" y="133" text-anchor="middle" class="t">self-attention</text>
+      <path d="M250 120 H279" class="s-mute f-none" stroke-width="1.5" marker-end="url(#ah-mute)"/>
+      <circle cx="292" cy="120" r="11" class="f-surf s-ink" stroke-width="1.5"/><path d="M286 120 H298 M292 114 V126" class="s-ink" stroke-width="1.5"/>
+      <path d="M303 120 H326" class="s-mute f-none" stroke-width="1.5" marker-end="url(#ah-mute)"/>
+      <rect x="330" y="94" width="84" height="52" rx="6" class="f-surf s-ink" stroke-width="1.5"/><text x="372" y="125" text-anchor="middle" class="t">LayerNorm</text>
+      <path d="M414 120 H446" class="s-mute f-none" stroke-width="1.5" marker-end="url(#ah-mute)"/>
+      <rect x="450" y="94" width="110" height="52" rx="6" class="f-surf s-v" stroke-width="2"/><text x="505" y="116" text-anchor="middle" class="t">MLP</text><text x="505" y="133" text-anchor="middle" class="t2">D → 4D → D</text>
+      <path d="M560 120 H589" class="s-mute f-none" stroke-width="1.5" marker-end="url(#ah-mute)"/>
+      <circle cx="602" cy="120" r="11" class="f-surf s-ink" stroke-width="1.5"/><path d="M596 120 H608 M602 114 V126" class="s-ink" stroke-width="1.5"/>
+      <path d="M613 120 H636" class="s-mute f-none" stroke-width="1.5" marker-end="url(#ah-mute)"/>
+      <rect x="640" y="94" width="84" height="52" rx="6" class="f-surf s-ink" stroke-width="1.5"/><text x="682" y="125" text-anchor="middle" class="t">LayerNorm</text>
+      <path d="M724 120 H768" class="s-mute f-none" stroke-width="1.5" marker-end="url(#ah-mute)"/>
+      <path d="M66 120 V48 H292 V105" class="s-k f-none" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#ah-k)"/><text x="179" y="38" text-anchor="middle" class="t2">residual: X is added back</text>
+      <path d="M430 120 V48 H602 V105" class="s-k f-none" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#ah-k)"/><text x="516" y="38" text-anchor="middle" class="t2">residual</text>
+      <text x="175" y="168" text-anchor="middle" class="t2">tokens exchange information</text><text x="505" y="168" text-anchor="middle" class="t2">each token on its own</text>
+    </svg></div>
+    <figcaption>One block maps N × D to N × D, so blocks stack. Only the attention sublayer moves information between tokens. This is the layout in Prince and in the 2017 paper; most current models put each LayerNorm before its sublayer instead, which trains more stably when the stack is deep.</figcaption>
+  </figure>
+  <dl class="parts">
+    <div><dt><span class="src">Week 10 · ResNets</span>Residual connections</dt><dd>Each sublayer computes a correction that is added to its input. The token keeps its own identity, and gradients have a short path through the stack.</dd></div>
+    <div><dt><span class="src">Weeks 3–4 · shallow networks</span>The MLP</dt><dd>A one-hidden-layer network applied to every token separately with the same weights. It is a 1×1 convolution over the sequence, and it supplies the nonlinearity. With hidden width 4D it holds 8D² weights against 4D² in attention: two thirds of the block.</dd></div>
+    <div><dt><span class="src">Week 10 · BatchNorm’s cousin</span>Layer normalization</dt><dd>Each token’s D numbers are shifted and scaled to zero mean and unit variance. No statistic crosses tokens or examples, so it behaves the same for any batch size or sentence length.</dd></div>
+    <div><dt><span class="src">Step 7</span>Position, once</dt><dd>The positional encoding is added to X before the first block. The residual path carries it upward to every later block.</dd></div>
+  </dl>
+  <div class="lab">
+    <h3>Which numbers share one mean and variance <small>rows are tokens, columns are features</small></h3>
+    <div class="norms">
+      <figure><div class="ngrid" id="ngBN"></div><figcaption><b>BatchNorm</b>: one feature across all rows. It depends on what else is in the batch.</figcaption></figure>
+      <figure><div class="ngrid" id="ngLN"></div><figcaption><b>LayerNorm</b>: one token across its D features. It depends on nothing but that token.</figcaption></figure>
+    </div>
+  </div>
+  <div class="codebox"><button type="button" class="copy">Copy</button><pre><code>class Block(nn.Module):
+    def __init__(self, D, H):
+        super().__init__()
+        self.attn = nn.MultiheadAttention(D, H, batch_first=True)
+        self.mlp  = nn.Sequential(nn.Linear(D, 4 * D), nn.GELU(), nn.Linear(4 * D, D))
+        self.n1, self.n2 = nn.LayerNorm(D), nn.LayerNorm(D)
+
+    def forward(self, X):                          <span class="c"># X: (B, N, D)</span>
+        X = self.n1(X + self.attn(X, X, X, need_weights=False)[0])
+        return self.n2(X + self.mlp(X))</code></pre></div>
+  <div class="prose">
+    <p>A transformer is this block repeated. The 2017 base model stacks 6 blocks with D = 512 (65 million parameters). BERT-base stacks 12 with D = 768 (110 million).</p>
+  </div>
+</section>
+
+<section class="step" id="families" data-min="6" data-short="Families">
+  <div class="prose">
+    <p class="eyebrow"><span class="n">Step 10</span> · 6 min · Glassner pp. 588–596 · UDL §12.6–12.10</p>
+    <h2>Three ways to use the block</h2>
+    <p>The same block gives three model families. The difference is which tokens each position is allowed to read, set by a mask applied to the scores before the softmax.</p>
+  </div>
+  <div class="lab" id="mkLab">
+    <h3>Attention weights with and without a causal mask</h3>
+    <div class="seg" id="mkMode" role="group" aria-label="Mask"><button type="button" data-v="0">Encoder: read everything</button><button type="button" data-v="1">Decoder: read only the past</button></div>
+    <div class="mxrow" id="mkBody"></div>
+    <p class="readout" id="mkOut"></p>
+  </div>
+  <div class="scroll"><table class="t">
+    <thead><tr><th scope="col">Family</th><th scope="col">Each token reads</th><th scope="col">Trained to</th><th scope="col">Used for</th><th scope="col">Example</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Encoder</th><td>All tokens, left and right</td><td>Fill in tokens that were hidden</td><td>Classification, retrieval, embeddings</td><td>BERT</td></tr>
+      <tr><th scope="row">Decoder</th><td>Itself and earlier tokens</td><td>Predict the next token</td><td>Text generation</td><td>GPT</td></tr>
+      <tr><th scope="row">Encoder–decoder</th><td>Decoder also reads the encoder output</td><td>Produce an output sequence from an input one</td><td>Translation, summarization</td><td>The 2017 transformer, T5</td></tr>
+    </tbody>
+  </table></div>
+  <div class="prose">
+    <p>The encoder–decoder link is called cross-attention: queries come from the decoder, keys and values from the encoder. It is the translation lookup from Step 4, unchanged.</p>
+    <h3>Back to images</h3>
+    <p>A Vision Transformer cuts a 224 × 224 image into 16 × 16 patches, giving 14 × 14 = 196 tokens, and runs an encoder on them. The patch embedding is a convolution with kernel 16 and stride 16. After that there is no locality built in: the model must learn from data what a convolution assumed from the start, so it needs more data, and wins when it has enough.</p>
+  </div>
+  <figure class="patches">
+    <div class="pgrid" id="vitGrid" role="img" aria-label="A 4 by 4 grid of image patches"></div>
+    <svg width="40" height="16" viewBox="0 0 40 16" aria-hidden="true"><path d="M2 8 H34" class="s-mute f-none" stroke-width="1.5" marker-end="url(#ah-mute)"/></svg>
+    <div class="pseq" id="vitSeq" role="img" aria-label="The same patches as a sequence of 16 tokens after a class token"></div>
+    <figcaption>Patches become a sequence. A learned [CLS] token is prepended and its final vector is used for classification.</figcaption>
+  </figure>
+</section>
+
+<section class="step" id="wrap-up" data-min="3" data-short="End">
+  <div class="prose">
+    <p class="eyebrow"><span class="n">Step 11</span> · 3 min · summary</p>
+    <h2>What each architecture gave us</h2>
+  </div>
+  <div class="scroll"><table class="t">
+    <thead><tr><th scope="col"></th><th scope="col">Fully connected</th><th scope="col">Convolution</th><th scope="col">Recurrent</th><th scope="col" class="hl">Self-attention</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Any length N</th><td>No</td><td>Yes</td><td>Yes</td><td class="hl">Yes</td></tr>
+      <tr><th scope="row">Weights shared across positions</th><td>No</td><td>Yes</td><td>Yes</td><td class="hl">Yes</td></tr>
+      <tr><th scope="row">Layers or steps between two far tokens</th><td>1</td><td>O(N/k)</td><td>O(N)</td><td class="hl">1</td></tr>
+      <tr><th scope="row">Positions computed in parallel</th><td>Yes</td><td>Yes</td><td>No</td><td class="hl">Yes</td></tr>
+      <tr><th scope="row">Mixing weights depend on the content</th><td>No</td><td>No</td><td>Only through the state</td><td class="hl">Yes</td></tr>
+      <tr><th scope="row">Knows word order by itself</th><td>Yes</td><td>Yes</td><td>Yes</td><td class="hl">No, needs a positional encoding</td></tr>
+      <tr><th scope="row">Cost of one layer</th><td>O(N²D²)</td><td>O(kND²)</td><td>O(ND²)</td><td class="hl">O(N²D)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="prose">
+    <p>The last three rows of costs follow Table 1 of Vaswani et al. (2017). Self-attention is the cheaper layer whenever <span class="m">N &lt; D</span>, and the expensive one for very long sequences.</p>
+    <h3>Check your understanding</h3>
+  </div>
+  <div class="qs">
+    <details><summary>You double the sequence length. What happens to the cost of a self-attention layer, and of a recurrent layer?</summary><p>Self-attention costs four times as much, because the attention matrix is N × N. The recurrent layer costs twice as much, but its 2N steps must still run one after another.</p></details>
+    <details><summary>You remove the positional encoding from an encoder and classify by averaging the output tokens. What can the model no longer tell apart?</summary><p>Any two sentences made of the same words in a different order. Permuting the input permutes the outputs, and the average does not change. The model is a bag-of-words classifier.</p></details>
+    <details><summary>With D = 1,024 and unit-variance entries, how large is a typical unscaled score, and what does the softmax do with it?</summary><p>The standard deviation is √1,024 = 32. Differences of that size make the softmax nearly one-hot, where its derivative is close to zero, so the weights producing the queries and keys stop learning.</p></details>
+    <details><summary>In one block, which parts move information between tokens?</summary><p>Only the attention sublayer. The MLP, both LayerNorms and both residual additions act on each token separately.</p></details>
+    <details><summary>A decoder is trained with a causal mask on a sentence of N tokens. How many next-token predictions does one forward pass give?</summary><p>One per position. Because no position can read ahead, all the predictions are computed in a single parallel pass. At generation time the model has to produce one token, append it, and run again.</p></details>
+    <details><summary>Why does “it” fail to choose between “dog” and “ball” in one layer, and what changes with two?</summary><p>In layer 1 the query of “it” is a function of the embedding of “it” only, and both nouns match it equally. After layer 1, “hungry” carries information about “dog”. In layer 2 “it” can attend to “hungry” and receive that information.</p></details>
+  </div>
+  <div class="prose">
+    <h3>Read next</h3>
+    <ul>
+      <li>Glassner, <i>Deep Learning: A Visual Approach</i>, Chapter 20: the reading this page supplements.</li>
+      <li>The <a href="https://harunpirim.github.io/IMSE774-NeuralNetworks/notes/11-transformers.html">Week 11 lecture note</a>, which follows that chapter with figures and runnable code.</li>
+      <li>Prince, <a href="https://udlbook.github.io/udlbook/"><i>Understanding Deep Learning</i></a>, Chapter 12.</li>
+      <li>Vaswani et al., <a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a> (2017).</li>
+      <li>Bahdanau, Cho and Bengio, <a href="https://arxiv.org/abs/1409.0473">Neural Machine Translation by Jointly Learning to Align and Translate</a> (2015).</li>
+      <li>Dosovitskiy et al., <a href="https://arxiv.org/abs/2010.11929">An Image Is Worth 16×16 Words</a> (2021).</li>
+      <li>Cordonnier, Loukas and Jaggi, <a href="https://arxiv.org/abs/1911.03584">On the Relationship between Self-Attention and Convolutional Layers</a> (2020).</li>
+    </ul>
+  </div>
+</section>
+</main>
+<footer><div class="wrap">Toy weights and embeddings on this page are set by hand to make the patterns readable. A trained transformer learns its own, and they are rarely this tidy.</div></footer>
+
+<script>
+(()=>{'use strict';
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const h=(tag,props={},...kids)=>{const e=document.createElement(tag);
+  for(const [k,v] of Object.entries(props)){ if(v==null)continue;
+    if(k==='class')e.className=v; else if(k==='style')e.style.cssText=v; else if(k==='text')e.textContent=v;
+    else if(k==='html')e.innerHTML=v; else if(k.startsWith('on'))e.addEventListener(k.slice(2),v); else e.setAttribute(k,v);}
+  for(const c of kids.flat())if(c!=null)e.append(c); return e;};
+const f2=v=>{let s=v.toFixed(2); if(s==='-0.00')s='0.00'; return s.replace(/^(-?)0\./,'$1.');};
+const f1=v=>{const s=v.toFixed(1); return s==='-0.0'?'0.0':s;};
+const SUP={'-':'⁻',0:'⁰',1:'¹',2:'²',3:'³',4:'⁴',5:'⁵',6:'⁶',7:'⁷',8:'⁸',9:'⁹'};
+const sup=n=>[...String(n)].map(c=>SUP[c]).join('');
+const sci=v=>{const [m,e]=v.toExponential(1).split('e'); return +e===0?m:`${m} × 10${sup(+e)}`;};
+const clamp01=t=>Math.max(0,Math.min(1,t));
+const seqC=t=>`color-mix(in oklab, var(--seq) ${Math.round(clamp01(t)*100)}%, var(--cell))`;
+const divC=(v,max)=>`color-mix(in oklab, var(${v>=0?'--seq':'--neg'}) ${Math.round(clamp01(Math.abs(v)/max)*100)}%, var(--cell))`;
+const press=(group,val)=>$$('button',group).forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.v===String(val))));
+
+/* ---------- linear algebra ---------- */
+const matmul=(A,B)=>A.map(r=>B[0].map((_,j)=>r.reduce((s,a,k)=>s+a*B[k][j],0)));
+const tr=A=>A[0].map((_,j)=>A.map(r=>r[j]));
+const softmax=r=>{const m=Math.max(...r), e=r.map(v=>Math.exp(v-m)), s=e.reduce((a,b)=>a+b,0); return e.map(v=>v/s);};
+const argmax=r=>r.indexOf(Math.max(...r));
+
+/* ---------- the toy model ---------- */
+const FEATS=['animate','object','predicate','function'];
+const EMB={the:[0,0,0,1],dog:[1,0,0,0],ignored:[0,0,1,0],ball:[0,1,0,0],because:[0,0,.2,.9],it:[.4,.4,0,.6],was:[0,0,.5,.8],hungry:[.6,0,.8,0],round:[0,.6,.8,0]};
+const WQ=[[6,0,3,0],[0,6,3,0],[3,3,0,0],[0,0,0,1.5]];
+const WK=[[1,0,0,0],[0,1,0,0],[-1,-1,1,0],[0,0,0,1]];
+const WV=[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]];
+const D=4;
+const sentence=last=>['the','dog','ignored','the','ball','because','it','was',last];
+function attend(X,mask=false){
+  const Q=matmul(X,WQ),K=matmul(X,WK),V=matmul(X,WV),S=matmul(Q,tr(K));
+  const Ss=S.map(r=>r.map(v=>v/Math.sqrt(D)));
+  const A=Ss.map((r,i)=>softmax(r.map((v,j)=>mask&&j>i?-Infinity:v)));
+  return {Q,K,V,S,Ss,A,O:matmul(A,V)};
+}
+
+/* ---------- matrix renderer ---------- */
+function matrix({title,shape,rows,cols,data,kind='div',max=1,fmt=f2,sel=-1,onSel,compact=false,masked}){
+  const tb=h('tbody');
+  data.forEach((r,i)=>{
+    const row=h('tr',{class:i===sel?'sel':null},h('th',{scope:'row',text:rows[i]}));
+    r.forEach((v,j)=>{
+      const mk=masked&&masked(i,j), t=kind==='seq'?v:Math.abs(v)/max;
+      const cls=mk?'masked':(kind==='seq'||v>=0)?(t>.68?'strong':null):(t>.85?'strongneg':null);
+      const td=h('td',{class:cls,text:mk||compact?'':fmt(v),title:`${rows[i]} → ${cols[j]}: ${mk?'masked':fmt(v)}`});
+      if(!mk)td.style.background=kind==='seq'?seqC(v):divC(v,max);
+      row.append(td);});
+    if(onSel){row.style.cursor='pointer';row.addEventListener('click',()=>onSel(i));}
+    tb.append(row);});
+  const head=h('tr',{},h('th'),cols.map(c=>h('th',{class:'col',scope:'col'},h('span',{text:c}))));
+  return h('figure',{class:'mxfig'},h('figcaption',{},h('b',{html:title}),shape?h('span',{class:'shape',text:shape}):null),
+    h('div',{class:'scroll'},h('table',{class:'mx'+(compact?' compact':'')},h('thead',{},head),tb)));
+}
+function barList(title,labels,w){
+  const top=argmax(w);
+  return h('div',{class:'blist'},h('div',{class:'ttl',html:title}),labels.map((l,j)=>h('div',{class:'brow'+(j===top?' top':'')},
+    h('span',{class:'lab-t',text:l}),h('div',{class:'btrack'},h('div',{class:'bfill',style:`width:${(w[j]*100).toFixed(1)}%`})),h('span',{text:Math.round(w[j]*100)+'%'}))));
+}
+
+/* ---------- plan bar, scrollspy, clock ---------- */
+const sections=$$('section.step'), mins=sections.map(s=>+s.dataset.min), total=mins.reduce((a,b)=>a+b,0);
+const segs=$('#segs');
+sections.forEach((s,i)=>segs.append(h('li',{style:`--min:${mins[i]}`},h('a',{href:'#'+s.id,title:`Step ${i+1}: ${s.dataset.short}, ${mins[i]} min`},h('span',{text:String(i+1)}),h('span',{class:'lbl',text:s.dataset.short})))));
+const nowMark=h('span',{class:'now',hidden:''}); segs.append(nowMark);
+const links=$$('a',segs);
+if('IntersectionObserver' in window){
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)links.forEach((a,i)=>{if(sections[i]===e.target)a.setAttribute('aria-current','true');else a.removeAttribute('aria-current');});}),{rootMargin:'-15% 0px -75% 0px'});
+  sections.forEach(s=>io.observe(s));
+}
+let elapsed=0,t0=0,timer=null;
+const mmss=s=>`${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
+function tick(){
+  if(timer)elapsed=(Date.now()-t0)/1000;
+  $('#clockOut').textContent=`${mmss(elapsed)} / ${total}:00`; $('#planOut').textContent=mmss(elapsed);
+  nowMark.hidden=elapsed===0; nowMark.style.left=Math.min(100,elapsed/(total*60)*100)+'%';
+  if(elapsed>0){let acc=0,i=0; while(i<mins.length-1&&elapsed/60>=acc+mins[i]){acc+=mins[i];i++;}
+    $('#clockWhere').textContent=elapsed>=total*60?'Time is up.':`The plan is at Step ${i+1}: ${sections[i].dataset.short}.`;}
+}
+$('#clockBtn').addEventListener('click',e=>{
+  if(timer){clearInterval(timer);timer=null;e.target.textContent='Resume';}
+  else{t0=Date.now()-elapsed*1000;timer=setInterval(tick,500);e.target.textContent='Pause';}
+  tick();});
+$('#clockReset').addEventListener('click',()=>{clearInterval(timer);timer=null;elapsed=0;$('#clockBtn').textContent='Start lecture clock';
+  $('#clockWhere').textContent='A gold marker on the plan bar shows where the lecture should be.';tick();});
+
+/* ---------- step 2: receptive field ---------- */
+function rf(){
+  const k=+$('#rfK').value,L=+$('#rfL').value,p=+$('#rfP').value-1,g=$('#rfGrid'); g.replaceChildren();
+  $('#rfLo').textContent=L; $('#rfPo').textContent=p+1;
+  for(let l=L;l>=0;l--){const half=(L-l)*(k-1)/2;
+    g.append(h('div',{class:'rfrow'},h('span',{class:'l',text:l?`layer ${l}`:'tokens'}),
+      Array.from({length:17},(_,i)=>h('div',{class:'rfcell'+(Math.abs(i-p)<=half?' on':'')+(l===L&&i===p?' unit':'')}))));}
+  const half=L*(k-1)/2, seen=Math.min(16,p+half)-Math.max(0,p-half)+1, need=Math.ceil(16/(k-1));
+  $('#rfOut').innerHTML=`After <b>${L}</b> layer${L>1?'s':''} of kernel ${k}, the outlined unit sees <b>${seen} of 17</b> tokens (the full field is 1 + L(k − 1) = ${1+L*(k-1)}; the sentence edge may cut it). A unit that covers all 17 tokens needs <b>${need} layers</b>. Whatever the words are, the kernel applies the same weights.`;
+}
+['rfK','rfL','rfP'].forEach(id=>$('#'+id).addEventListener('input',rf)); rf();
+
+/* ---------- step 3: RNN ---------- */
+(function(){
+  const cx=i=>90+i*135,toks=['the','dog','ignored','…','hungry'],hs=['h₁','h₂','h₃','…','h₉']; let s='';
+  toks.forEach((t,i)=>{
+    s+=`<rect x="${cx(i)-38}" y="40" width="76" height="40" rx="6" class="f-surf s-ink" stroke-width="1.5"/><text x="${cx(i)}" y="65" text-anchor="middle" class="t">${hs[i]}</text>`;
+    s+=`<text x="${cx(i)}" y="174" text-anchor="middle" class="t2">${t}</text><line x1="${cx(i)}" y1="156" x2="${cx(i)}" y2="86" class="s-mute" stroke-width="1.5" marker-end="url(#ah-mute)"/>`;
+    if(i<4)s+=`<line x1="${cx(i)+38}" y1="60" x2="${cx(i+1)-43}" y2="60" class="s-k" stroke-width="2" marker-end="url(#ah-k)"/><text x="${cx(i)+67}" y="50" text-anchor="middle" class="t2">Wₕ</text>`;});
+  s+=`<text x="${cx(0)+8}" y="126" class="t2">Wₓ</text><text x="668" y="24" text-anchor="end" class="t2">h₉ must hold the whole sentence</text>`;
+  $('#rnnSvg').innerHTML=s;
+  const x=$('#rnnX'); for(let t=1;t<=20;t++)x.append(h('span',{text:[1,5,10,15,20].includes(t)?'t='+t:''}));
+})();
+function rnn(){
+  const g=+$('#rnnG').value,b=$('#rnnBars'); b.replaceChildren(); $('#rnnGo').textContent=g.toFixed(2);
+  for(let t=1;t<=20;t++){const v=Math.pow(g,20-t),dec=Math.log10(v),px=Math.min(104,Math.abs(dec)*16);
+    const st=dec<=0?`top:72px;height:${px}px;border-radius:0 0 4px 4px`:`bottom:104px;height:${Math.min(72,px)}px;border-radius:4px 4px 0 0`;
+    b.append(h('div',{class:'colm',title:`step ${t}: γ^${20-t} = ${sci(v)}`},h('div',{class:'bar',style:st})));}
+  const v=Math.pow(g,19);
+  const verdict=g<0.97?'The first token has almost no influence on the last state: the gradient vanishes.':g>1.03?'The gradient explodes, and training diverges unless it is clipped.':'Only at γ ≈ 1 does the signal survive, and nothing keeps a trained network there.';
+  $('#rnnOut').innerHTML=`Gradient from step 20 back to token 1: γ<sup>19</sup> = <b>${sci(v)}</b>. ${verdict}`;
+}
+$('#rnnG').addEventListener('input',rnn); rnn();
+
+/* ---------- step 4: routes and soft lookup ---------- */
+(function(){
+  const x=i=>20+i*25;
+  const dots=y=>Array.from({length:9},(_,i)=>`<circle cx="${x(i)}" cy="${y}" r="3.5" class="f-mute"/>`).join('');
+  const ends=y=>`<circle cx="${x(0)}" cy="${y}" r="5.5" class="f-brand"/><circle cx="${x(8)}" cy="${y}" r="5.5" class="f-brand"/><text x="${x(0)}" y="${y+19}" class="t2" text-anchor="middle">1</text><text x="${x(8)}" y="${y+19}" class="t2" text-anchor="middle">9</text>`;
+  const pl=pts=>`<polyline points="${pts.map(p=>p.join(',')).join(' ')}" class="s-brand f-none" stroke-width="2"/>`;
+  let c=''; for(let l=1;l<=4;l++)for(let i=0;i<9;i++)c+=`<circle cx="${x(i)}" cy="${104-l*20}" r="2.5" class="f-faint"/>`;
+  c+=pl([0,1,2,3,4].map(l=>[x(l),104-l*20]))+pl([0,1,2,3,4].map(l=>[x(8-l),104-l*20]))+`<circle cx="${x(4)}" cy="24" r="5" class="f-brand"/><text x="${x(4)}" y="11" text-anchor="middle" class="t2">layer 4</text>`;
+  $('#rtConv').innerHTML=c+dots(104)+ends(104);
+  let r=''; for(let i=0;i<8;i++)r+=`<path d="M${x(i)+3} 95 q9.5 -24 19 0" class="s-brand f-none" stroke-width="2" marker-end="url(#ah-brand)"/>`;
+  $('#rtRnn').innerHTML=r+dots(104)+ends(104);
+  $('#rtAtt').innerHTML=`<path d="M${x(8)-4} 95 Q120 -12 ${x(0)+5} 94" class="s-brand f-none" stroke-width="2" marker-end="url(#ah-brand)"/><text x="120" y="78" text-anchor="middle" class="t2">one hop</text>`+dots(104)+ends(104);
+})();
+const KEYS=[{a:20,v:10},{a:105,v:20},{a:200,v:30},{a:290,v:40}], SUBS=['₁','₂','₃','₄'], rad=d=>d*Math.PI/180;
+function lookup(){
+  const a=+$('#lkA').value,beta=+$('#lkB').value; $('#lkAo').textContent=a+'°'; $('#lkBo').textContent=beta.toFixed(1);
+  const dots=KEYS.map(k=>Math.cos(rad(a-k.a))), w=softmax(dots.map(d=>beta*d)), out=w.reduce((s,x,i)=>s+x*KEYS[i].v,0);
+  const P=(deg,r)=>[r*Math.cos(rad(deg)),-r*Math.sin(rad(deg))];
+  let s=`<circle r="100" class="f-none s-rule" stroke-width="1"/><line x1="-130" x2="130" class="s-rule" stroke-width="1"/><line y1="-130" y2="130" class="s-rule" stroke-width="1"/>`;
+  KEYS.forEach((k,i)=>{const [x,y]=P(k.a,100),[lx,ly]=P(k.a,128);
+    s+=`<line x2="${x*.95}" y2="${y*.95}" class="s-k" stroke-width="${1.5+4*w[i]}" marker-end="url(#ah-k)" opacity="${.45+.55*w[i]}"/><text x="${lx}" y="${ly}" text-anchor="middle" class="t">k${SUBS[i]}</text><text x="${lx}" y="${ly+14}" text-anchor="middle" class="t2">v=${k.v}</text>`;});
+  const [qx,qy]=P(a,100),[tx,ty]=P(a,72);
+  s+=`<line x2="${qx*.93}" y2="${qy*.93}" class="s-q" stroke-width="4" marker-end="url(#ah-q)"/><text x="${tx+12}" y="${ty-8}" class="t">q</text><circle id="lkHandle" cx="${qx}" cy="${qy}" r="16" class="f-q" fill-opacity=".25"/>`;
+  $('#lkSvg').innerHTML=s;
+  const T=$('#lkT'); T.replaceChildren(
+    h('thead',{},h('tr',{},['Key','Value','q·k','Weight',''].map((t,i)=>h('th',{scope:'col',class:i===4?'w':null,text:t})))),
+    h('tbody',{},KEYS.map((k,i)=>h('tr',{},h('td',{text:'k'+SUBS[i]}),h('td',{text:k.v}),h('td',{text:dots[i].toFixed(2)}),h('td',{text:Math.round(w[i]*100)+'%'}),
+      h('td',{class:'w'},h('div',{class:'btrack'},h('div',{class:'bfill',style:`width:${w[i]*100}%`})))))),
+    h('tfoot',{},h('tr',{},h('td',{colspan:'5',text:`Output = Σ weight × value = ${out.toFixed(1)}`}))));
+}
+(function(){
+  const svg=$('#lkSvg'); let drag=false;
+  const setFrom=e=>{const r=svg.getBoundingClientRect(),x=e.clientX-(r.left+r.width/2),y=e.clientY-(r.top+r.height/2);
+    $('#lkA').value=Math.round((Math.atan2(-y,x)*180/Math.PI+360)%360); lookup();};
+  svg.addEventListener('pointerdown',e=>{if(e.target.id==='lkHandle'){drag=true;svg.setPointerCapture(e.pointerId);e.preventDefault();}});
+  svg.addEventListener('pointermove',e=>{if(drag)setFrom(e);});
+  ['pointerup','pointercancel'].forEach(t=>svg.addEventListener(t,()=>{drag=false;}));
+  ['lkA','lkB'].forEach(id=>$('#'+id).addEventListener('input',lookup)); lookup();
+})();
+
+/* ---------- step 5: self-attention by hand ---------- */
+const sa={last:'hungry',sel:8,step:6};
+const STEPS=['Embed','Project','Score','Scale','Softmax','Mix'];
+STEPS.forEach((t,i)=>$('#saSteps').append(h('button',{type:'button','data-v':i+1,text:`${i+1} ${t}`,onclick:()=>{sa.step=i+1;renderSA();}})));
+$$('#saLast button').forEach(b=>b.addEventListener('click',()=>{sa.last=b.dataset.v;renderSA();renderHeads();renderMask();renderShuffle();}));
+$('#saNext').addEventListener('click',()=>{sa.step=Math.min(6,sa.step+1);renderSA();});
+$('#saRestart').addEventListener('click',()=>{sa.step=1;renderSA();});
+function card(n,title,desc,...figs){return h('div',{class:'card'},h('h4',{},h('span',{class:'n',text:n}),h('span',{html:title})),h('p',{html:desc}),h('div',{class:'mxrow'},figs));}
+function renderSA(){
+  const toks=sentence(sa.last),X=toks.map(t=>EMB[t]),r=attend(X),i=sa.sel,pick=j=>{sa.sel=j;renderSA();};
+  press($('#saLast'),sa.last); press($('#saSteps'),sa.step); $('#saNext').disabled=sa.step===6;
+  const chips=$('#saTok'); chips.replaceChildren(...toks.map((t,j)=>h('button',{type:'button','aria-pressed':String(j===i),text:t,onclick:()=>pick(j)})));
+  const smax=Math.max(...r.S.flat().map(Math.abs)), qn=['q₁','q₂','q₃','q₄'], kn=['k₁','k₂','k₃','k₄'];
+  const base={rows:toks,sel:i,onSel:pick};
+  const cards=[
+    card(1,'Embed each token','Every token becomes a row of D = 4 numbers. In this toy the four features have names so you can read them. A trained model learns its own, unnamed.',
+      matrix({...base,title:'X',shape:'9 × 4',cols:FEATS,data:X,kind:'seq'})),
+    card(2,'Project to queries, keys, values','Three linear maps of the same X. <b class="cq">Q</b> = XW<sub>q</sub> is what each token looks for. <b class="ck">K</b> = XW<sub>k</sub> is what it offers for matching. <b class="cv">V</b> = XW<sub>v</sub> is what it hands over when read. Here W<sub>v</sub> is the identity, so the values stay readable.',
+      matrix({...base,title:'<span class="cq">Q</span>',shape:'9 × 4',cols:qn,data:r.Q,max:6,fmt:f1}),
+      matrix({...base,title:'<span class="ck">K</span>',shape:'9 × 4',cols:kn,data:r.K,max:1,fmt:f1}),
+      matrix({...base,title:'<span class="cv">V</span>',shape:'9 × 4',cols:FEATS,data:r.V,kind:'seq'}),
+      h('details',{style:'flex-basis:100%'},h('summary',{text:'Show the hand-set weights'}),
+        h('div',{class:'mxrow'},matrix({title:'W<sub>q</sub>',shape:'4 × 4',rows:FEATS,cols:qn,data:WQ,max:6,fmt:f1}),matrix({title:'W<sub>k</sub>',shape:'4 × 4',rows:FEATS,cols:kn,data:WK,max:1,fmt:f1})),
+        h('p',{html:'Read W<sub>q</sub> by rows: a predicate looks for nouns of either kind, and an animate noun looks mostly for animate nouns. W<sub>k</sub> subtracts “predicate” from the two noun slots, so a predicate such as “hungry” does not simply match itself.'}))),
+    card(3,'Score every query against every key','S = QK<sup>T</sup>. Row i holds the dot products of token i’s query with all nine keys: how well each token matches what token i is looking for. Green is a match, rust a mismatch.',
+      matrix({...base,title:'S = QK<sup>T</sup>',shape:'9 × 9',cols:toks,data:r.S,max:smax,fmt:f1})),
+    card(4,'Scale','Divide every score by √D = √4 = 2. Step 6 of the lecture shows why this matters at realistic widths.',
+      matrix({...base,title:'S / √D',shape:'9 × 9',cols:toks,data:r.Ss,max:smax,fmt:f1})),
+    card(5,'Softmax each row','Exponentiate and normalize across each row. Every row now holds positive weights that sum to 1: the attention of that token over the sentence.',
+      matrix({...base,title:'A = softmax(S / √D)',shape:'9 × 9, rows sum to 1',cols:toks,data:r.A,kind:'seq'}),
+      barList(`“${toks[i]}” reads from`,toks,r.A[i])),
+    card(6,'Mix the values','Output = AV. Each output row is the weighted average of the value rows, using that token’s attention weights.',
+      matrix({...base,title:'Output = AV',shape:'9 × 4',cols:FEATS,data:r.O,kind:'seq'}),
+      matrix({title:`“${toks[i]}” before and after`,rows:['x (in)','output'],cols:FEATS,data:[X[i],r.O[i]],kind:'seq'}),
+      (()=>{const j=argmax(r.A[i]),pct=Math.round(r.A[i][j]*100);
+        const pc=w=>Math.round(w*100);
+        if(toks[i]==='it')return h('p',{style:'flex-basis:100%',html:`<b>“it” gives “dog” ${pc(r.A[i][1])}% and “ball” ${pc(r.A[i][4])}%.</b> The two nouns match its query equally, so one layer cannot tell which is meant.`});
+        const extra=j===i?' It mostly keeps its own value.':pct<40?' Its attention is spread thinly, so its output is close to an average of the sentence.':` Its output row now looks like “${toks[j]}”. The token has lost most of itself, which the residual connection in Step 9 repairs.`;
+        return h('p',{style:'flex-basis:100%',html:`<b>“${toks[i]}” puts ${pct}% of its attention on “${toks[j]}”.</b>${extra}`});})())];
+  $('#saBody').replaceChildren(...cards.slice(0,sa.step));
+}
+
+/* ---------- step 6: sqrt(D) ---------- */
+const DS=[4,16,64,256,1024], sdCache={};
+function mulberry(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+const gauss=r=>Math.sqrt(-2*Math.log(1-r()))*Math.cos(2*Math.PI*r());
+function sdCompute(Dn){
+  if(sdCache[Dn])return sdCache[Dn];
+  const r=mulberry(774),T=200,N=8; let first=null,ss=0,mu=0,ms=0;
+  for(let t=0;t<T;t++){const q=Array.from({length:Dn},()=>gauss(r)),s=[];
+    for(let j=0;j<N;j++){let d=0;for(let i=0;i<Dn;i++)d+=q[i]*gauss(r);s.push(d);ss+=d*d;}
+    const aU=softmax(s),aS=softmax(s.map(v=>v/Math.sqrt(Dn))); mu+=Math.max(...aU); ms+=Math.max(...aS); if(!first)first={aU,aS};}
+  return sdCache[Dn]={...first,std:Math.sqrt(ss/(T*N)),maxU:mu/T,maxS:ms/T};
+}
+function sd(){
+  const Dn=DS[+$('#sdD').value],r=sdCompute(Dn); $('#sdDo').textContent=Dn;
+  const draw=(el,a)=>el.replaceChildren(...a.map((v,j)=>h('div',{style:`height:${Math.max(1,v*100)}%`,title:`key ${j+1}: ${f2(v)}`})));
+  draw($('#sdU'),r.aU); draw($('#sdS'),r.aS);
+  $('#sdUc').textContent=`largest weight ${f2(Math.max(...r.aU))} in this draw, ${f2(r.maxU)} on average`;
+  $('#sdSc').textContent=`largest weight ${f2(Math.max(...r.aS))} in this draw, ${f2(r.maxS)} on average`;
+  $('#sdOut').innerHTML=`At D = ${Dn} the raw scores have standard deviation <b>${r.std.toFixed(1)}</b> (√D = ${Math.sqrt(Dn)}), measured over 200 random draws. After scaling it is ${(r.std/Math.sqrt(Dn)).toFixed(2)} at every width.`;
+}
+$('#sdD').addEventListener('input',sd); sd();
+
+/* ---------- step 7: shuffle and positional encoding ---------- */
+const pe4=p=>[Math.sin(p),Math.cos(p),Math.sin(p/100),Math.cos(p/100)];
+let order=[0,1,2,3,4,5,6,7,8];
+function renderShuffle(){
+  const toks=sentence(sa.last),usePE=$('#shPE').checked;
+  const run=ord=>attend(ord.map((ti,p)=>EMB[toks[ti]].map((v,d)=>v+(usePE?pe4(p)[d]:0)))).O;
+  const base=run([0,1,2,3,4,5,6,7,8]),O=run(order); let diff=0;
+  order.forEach((ti,p)=>O[p].forEach((v,d)=>{diff=Math.max(diff,Math.abs(v-base[ti][d]));}));
+  const mx=Math.max(1,...O.flat().map(Math.abs));
+  $('#shCards').replaceChildren(...order.map((ti,p)=>h('div',{class:'shcard'},h('span',{},h('b',{text:toks[ti]}),h('span',{class:'pos',text:`  pos ${p+1}`})),
+    h('div',{class:'vec'},O[p].map(v=>h('span',{text:f2(v),style:`background:${divC(v,mx)};color:${Math.abs(v)/mx>.68?(v>=0?'var(--on-seq)':'var(--on-neg)'):'var(--ink)'}`}))))));
+  const moved=order.some((v,i)=>v!==i);
+  $('#shOut').innerHTML=!moved?'Original order. Press shuffle and compare each token’s four output numbers before and after.'
+    :usePE?`Largest change in any token’s output after shuffling: <b>${diff.toFixed(3)}</b>. With position added to X, order changes the result.`
+    :`Largest change in any token’s output after shuffling: <b>${diff.toFixed(3)}</b>. The cards moved, the numbers did not. The layer cannot see word order.`;
+}
+$('#shBtn').addEventListener('click',()=>{const o=order.slice();do{for(let i=8;i>0;i--){const j=Math.floor(Math.random()*(i+1));[o[i],o[j]]=[o[j],o[i]];}}while(o.every((v,i)=>v===i));order=o;renderShuffle();});
+$('#shReset').addEventListener('click',()=>{order=[0,1,2,3,4,5,6,7,8];renderShuffle();});
+$('#shPE').addEventListener('change',renderShuffle);
+
+const om=i=>Math.pow(10000,-i/8), peSim=d=>{let s=0;for(let i=0;i<8;i++)s+=Math.cos(d*om(i));return s/8;};
+(function(){const c=$('#peCells');
+  for(let d=0;d<16;d++)for(let p=0;p<32;p++){const v=d%2?Math.cos(p*om(d>>1)):Math.sin(p*om(d>>1)); c.append(h('div',{style:`background:${divC(v,1)}`,title:`position ${p}, dimension ${d}: ${f2(v)}`}));}
+  const b=$('#peBars'); for(let p=0;p<32;p++)b.append(h('div'));})();
+function pe(){
+  const p=+$('#peP').value,k=+$('#peK').value,t=p+k; $('#pePo').textContent=p; $('#peKo').textContent=(k>0?'+':'')+k;
+  const s=$('#peSel'); s.style.left=`calc(${p/32*100}% - 1px)`; s.style.width=`calc(${100/32}% + 1px)`;
+  $$('#peBars div').forEach((el,j)=>{const v=peSim(t-j);el.style.height=Math.max(1,v*100)+'%';el.className=j===t?'peak':'';el.title=`position ${j}: similarity ${f2(v)}`;});
+  $('#peOut').innerHTML=`Similarity between the query from position ${p}${k?`, rotated by ${k>0?'+':''}${k},`:''} and the encoding of every position. `+
+    (t<0||t>31?'The target falls outside the 32 positions shown.':`It peaks at <b>position ${t}</b>${k?'':', the query’s own position'}. The slow dimensions keep neighbours similar too, so a head sharpens the peak with large weights.`);
+}
+['peP','peK'].forEach(id=>$('#'+id).addEventListener('input',pe)); pe();
+
+/* ---------- step 8: two heads ---------- */
+function renderHeads(){
+  const toks=sentence(sa.last),A=attend(toks.map(t=>EMB[t])).A;
+  const B=toks.map((_,i)=>softmax(toks.map((_,j)=>40*peSim(i-1-j))));
+  $('#hdBody').replaceChildren(
+    matrix({title:'Head A: content',shape:'predicates find their nouns',rows:toks,cols:toks,data:A,kind:'seq',compact:true}),
+    matrix({title:'Head B: position',shape:'each token reads the one before',rows:toks,cols:toks,data:B,kind:'seq',compact:true}));
+}
+
+/* ---------- step 9: norm grids ---------- */
+for(let i=0;i<24;i++){$('#ngBN').append(h('div',{class:i%6===2?'on':null}));$('#ngLN').append(h('div',{class:Math.floor(i/6)===1?'on':null}));}
+
+/* ---------- step 10: mask, ViT ---------- */
+let mkOn=0;
+$$('#mkMode button').forEach(b=>b.addEventListener('click',()=>{mkOn=+b.dataset.v;renderMask();}));
+function renderMask(){
+  const toks=sentence(sa.last),A=attend(toks.map(t=>EMB[t]),!!mkOn).A; press($('#mkMode'),mkOn);
+  $('#mkBody').replaceChildren(matrix({title:mkOn?'A with causal mask':'A, no mask',shape:'rows sum to 1',rows:toks,cols:toks,data:A,kind:'seq',masked:mkOn?(i,j)=>j>i:null}));
+  $('#mkOut').innerHTML=mkOn?`Scores above the diagonal are set to −∞ before the softmax, so their weights are exactly 0 and each row is renormalized over what remains. “dog” can no longer read “${sa.last}”. The last row is unchanged: it already had only the past to read. In code it is one line: <code>S.masked_fill(mask, float("-inf"))</code>.`
+    :'Without a mask every token reads the whole sentence, to its left and to its right. This is what an encoder does.';
+}
+(function(){for(let i=1;i<=16;i++){$('#vitGrid').append(h('span',{text:i}));}
+  $('#vitSeq').append(h('span',{class:'cls',text:'CLS'})); for(let i=1;i<=16;i++)$('#vitSeq').append(h('span',{text:i}));})();
+
+/* ---------- copy buttons ---------- */
+$$('.codebox .copy').forEach(b=>b.addEventListener('click',()=>{
+  const code=$('code',b.parentElement),done=()=>{b.textContent='Copied';setTimeout(()=>{b.textContent='Copy';},1500);};
+  const select=()=>{const r=document.createRange();r.selectNodeContents(code);const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Selected, press copy';};
+  try{navigator.clipboard.writeText(code.textContent).then(done,select);}catch(e){select();}}));
+
+renderSA(); renderShuffle(); renderHeads(); renderMask(); tick();
+})();
+</script>
+</body>
+</html>
